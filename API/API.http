@@ -1,6 +1,52 @@
 @API_HostAddress = http://localhost:5210
 
-GET {{API_HostAddress}}/weatherforecast/
+### 1. שליפת כל המשתמשים
+GET {{API_HostAddress}}/api/users
 Accept: application/json
 
-###
+### 2. שליפת משתמש לפי ID (לדוגמה ID = 1)
+GET {{API_HostAddress}}/api/users/2
+Accept: application/json
+
+### 3. הוספת משתמש חדש
+POST {{API_HostAddress}}/api/users
+Content-Type: application/json
+
+{
+  "username": "student_test_100",
+  "email": "test100@school.com",
+  "password": "123456password",
+  "roleId": 2,
+  "isActive": true
+}
+
+### 4. בדיקת התחברות (Login)
+POST {{API_HostAddress}}/api/users/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "123456"
+}
+
+### 5. עדכון תפקיד משתמש (RoleID = 3)
+PATCH {{API_HostAddress}}/api/users/4/role?newRoleId=3
+
+### 6. עדכון סיסמה
+PATCH {{API_HostAddress}}/api/users/4/password
+Content-Type: application/json
+
+"newSecurePassword123"
+
+### 7. עדכון אימייל
+PATCH {{API_HostAddress}}/api/users/4/email
+Content-Type: application/json
+
+"updated_email@school.com"
+
+### 8. ספירת משתמשים לפי תפקיד (Group By)
+GET {{API_HostAddress}}/api/users/count-by-role
+Accept: application/json
+
+### 9. מחיקת משתמש לפי ID
+DELETE {{API_HostAddress}}/api/users/11

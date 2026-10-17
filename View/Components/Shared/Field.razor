@@ -1,0 +1,30 @@
+﻿<div class="mb-3 text-start">
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label class="form-label text-light fw-bold">@Label</label>
+    }
+    <input type="@Type" 
+           class="form-control bg-dark text-light border-secondary" 
+           placeholder="@Placeholder" 
+           value="@Value" 
+           @onchange="OnInputChanged" />
+    @if (!string.IsNullOrEmpty(Error))
+    {
+        <div class="text-danger small mt-1">@Error</div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Label { get; set; } = string.Empty;
+    [Parameter] public string Type { get; set; } = "text";
+    [Parameter] public string Placeholder { get; set; } = string.Empty;
+    [Parameter] public string Value { get; set; } = string.Empty;
+    [Parameter] public string Error { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+
+    private async Task OnInputChanged(ChangeEventArgs e)
+    {
+        Value = e.Value?.ToString() ?? string.Empty;
+        await ValueChanged.InvokeAsync(Value);
+    }
+}
