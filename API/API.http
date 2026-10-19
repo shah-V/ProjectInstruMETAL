@@ -5,7 +5,7 @@ GET {{API_HostAddress}}/api/users
 Accept: application/json
 
 ### 2. שליפת משתמש לפי ID (לדוגמה ID = 1)
-GET {{API_HostAddress}}/api/users/2
+GET {{API_HostAddress}}/api/users/18
 Accept: application/json
 
 ### 3. הוספת משתמש חדש
@@ -13,8 +13,8 @@ POST {{API_HostAddress}}/api/users
 Content-Type: application/json
 
 {
-  "username": "student_test_100",
-  "email": "test100@school.com",
+  "username": "student_test_12300",
+  "email": "test12300@school.com",
   "password": "123456password",
   "roleId": 2,
   "isActive": true
