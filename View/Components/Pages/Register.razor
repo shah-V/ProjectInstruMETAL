@@ -1,349 +1,208 @@
 ﻿@page "/register"
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@using System.Net.Mail
+@using Model
 @inject HttpClient Http
+@inject NavigationManager Navigation
 
-<!DOCTYPE html>
-<html class="dark" dir="rtl" lang="he" style="">
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>הרשמה ל-instruMETAL | הצטרפו לקהילת המטאל והרוק המתקדם</title>
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;family=Rubik:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
-    <!-- Material Symbols -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script id="tailwind-config">
-            tailwind.config = {
-              darkMode: "class",
-              theme: {
-                extend: {
-                  "colors": {
-                    "on-error": "#690005",
-                    "primary-fixed-dim": "#00daf3",
-                    "surface-bright": "#39393b",
-                    "on-error-container": "#ffdad6",
-                    "tertiary": "#f8e7ff",
-                    "on-tertiary-fixed": "#2e004e",
-                    "secondary-fixed": "#ffdeac",
-                    "on-primary-fixed-variant": "#004f58",
-                    "outline-variant": "#3b494c",
-                    "secondary": "#ffd799",
-                    "on-tertiary": "#4c007d",
-                    "tertiary-fixed-dim": "#e0b6ff",
-                    "surface-container-lowest": "#0e0e10",
-                    "tertiary-container": "#e6c3ff",
-                    "on-secondary": "#432c00",
-                    "on-tertiary-fixed-variant": "#6a0baa",
-                    "surface-container-highest": "#353437",
-                    "surface-container-low": "#1b1b1d",
-                    "surface-dim": "#131315",
-                    "on-primary": "#00363d",
-                    "inverse-on-surface": "#303032",
-                    "inverse-primary": "#006875",
-                    "surface-tint": "#00daf3",
-                    "error": "#ffb4ab",
-                    "secondary-container": "#feb300",
-                    "surface": "#131315",
-                    "background": "#131315",
-                    "surface-container-high": "#2a2a2c",
-                    "on-secondary-container": "#6a4800",
-                    "on-surface": "#e5e1e4",
-                    "surface-variant": "#353437",
-                    "outline": "#849396",
-                    "primary-fixed": "#9cf0ff",
-                    "on-secondary-fixed-variant": "#604100",
-                    "on-background": "#e5e1e4",
-                    "inverse-surface": "#e5e1e4",
-                    "on-primary-fixed": "#001f24",
-                    "on-secondary-fixed": "#281900",
-                    "on-tertiary-container": "#7e2cbe",
-                    "tertiary-fixed": "#f2daff",
-                    "on-surface-variant": "#bac9cc",
-                    "on-primary-container": "#00626e",
-                    "primary-container": "#00e5ff",
-                    "error-container": "#93000a",
-                    "primary": "#c3f5ff",
-                    "secondary-fixed-dim": "#ffba38",
-                    "surface-container": "#201f21"
-                  },
-                  "borderRadius": {
-                    "DEFAULT": "0.125rem",
-                    "lg": "0.25rem",
-                    "xl": "0.5rem",
-                    "full": "0.75rem"
-                  },
-                  "spacing": {
-                    "space-xl": "2.5rem",
-                    "space-lg": "1.5rem",
-                    "margin-mobile": "1rem",
-                    "margin": "2rem",
-                    "gutter": "1.25rem",
-                    "space-sm": "0.5rem",
-                    "space-xs": "0.25rem",
-                    "gutter-mobile": "0.75rem",
-                    "space-md": "1rem"
-                  },
-                  "fontFamily": {
-                    "headline-md": ["Rubik"],
-                    "headline-sm": ["Rubik"],
-                    "label-lg": ["JetBrains Mono"],
-                    "label-sm": ["JetBrains Mono"],
-                    "headline-lg-mobile": ["Rubik"],
-                    "body-lg": ["Rubik"],
-                    "headline-xl": ["Rubik"],
-                    "body-md": ["Rubik"],
-                    "label-md": ["JetBrains Mono"],
-                    "headline-xl-mobile": ["Rubik"],
-                    "headline-lg": ["Rubik"],
-                    "body-sm": ["Rubik"]
-                  },
-                  "fontSize": {
-                    "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
-                    "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
-                    "label-lg": ["15px", { "lineHeight": "22px", "fontWeight": "600" }],
-                    "label-sm": ["11px", { "lineHeight": "16px", "fontWeight": "500" }],
-                    "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
-                    "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
-                    "headline-xl": ["40px", { "lineHeight": "48px", "fontWeight": "800" }],
-                    "body-md": ["15px", { "lineHeight": "24px", "fontWeight": "400" }],
-                    "label-md": ["13px", { "lineHeight": "18px", "fontWeight": "500" }],
-                    "headline-xl-mobile": ["30px", { "lineHeight": "38px", "fontWeight": "800" }],
-                    "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
-                    "body-sm": ["13px", { "lineHeight": "20px", "fontWeight": "400" }]
-                  }
-                }
-              }
-            }
-    </script>
-    <style>
-            .material-symbols-outlined {
-              font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-              display: inline-block;
-              vertical-align: middle;
-              line-height: 1;
-            }
-            .neon-cyan-glow {
-              box-shadow: 0 0 20px rgba(0, 229, 255, 0.4), inset 0 0 10px rgba(0, 229, 255, 0.15);
-            }
-            .neon-cyan-btn {
-              box-shadow: 0 0 24px rgba(0, 229, 255, 0.45);
-            }
-            .neon-cyan-btn:hover {
-              box-shadow: 0 0 32px rgba(0, 229, 255, 0.7);
-            }
-            .glass-card-border {
-              border: 1px solid rgba(255, 255, 255, 0.08);
-              box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.8), 0 0 35px -10px rgba(0, 229, 255, 0.12);
-            }
-            .input-ambient-glow:focus-within {
-              box-shadow: 0 0 14px rgba(0, 229, 255, 0.3);
-            }
-    </style>
-</head>
-<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-surface-container-lowest font-body-md text-body-md overflow-x-hidden relative">
-    <!-- Atmospheric Background Ambient Lights -->
-    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <!-- Top-Right Cyan Radial Aura -->
-        <div class="absolute -top-32 -right-32 w-[600px] h-[600px] bg-primary-container/10 rounded-full blur-[140px]"></div>
-        <!-- Bottom-Left Amber Radial Aura -->
-        <div class="absolute -bottom-40 -left-40 w-[550px] h-[550px] bg-secondary-container/10 rounded-full blur-[160px]"></div>
-        <!-- Mid-ground Subtle Circuit Grid Pattern Overlay -->
-        <div class="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] [background-size:28px_28px] opacity-70"></div>
-    </div>
-    
-    <!-- MAIN REGISTRATION CANVAS (Centered Stage) -->
-    <main class="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-10 md:py-16 relative z-10">
-        <div class="w-full max-w-xl mx-auto">
-            <!-- Obsidian Dark Glass Card -->
-            <div class="relative bg-surface-container-low/80 dark:bg-surface-container-low/80 backdrop-blur-2xl rounded-xl p-6 sm:p-10 glass-card-border overflow-hidden">
-                <!-- Subtle Top Edge Gradient Accent Bar -->
-                <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-primary-container to-secondary-container opacity-80"></div>
-                <!-- Card Header Section -->
-                <div class="text-center mb-8">
-                    <!-- Glowing Icon Badge -->
-                    <Logo />
-                    <!-- Brand Logo Text -->
-                    <div class="font-headline-sm text-headline-sm font-bold tracking-wider text-primary-container flex items-center justify-center gap-1.5 mb-1">
-                        <span class="">instruMETAL</span>
-                    </div>
-                    <!-- Main Title -->
-                    <h1 class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight mt-1 mb-2">
-                        הרשמה ל-instruMETAL
-                    </h1>
-                    <!-- Subtitle -->
-                    <p class="font-body-md text-body-md text-on-surface-variant max-w-md mx-auto leading-relaxed">
-                        הצטרפו עכשיו למאגר הטאבים והלימוד המקצועי לגיטרה, בס ותופים
-                    </p>
-                </div>
-                <!-- Registration Form -->
-                <form class="space-y-5" onsubmit="event.preventDefault();">
-                    <!-- Field 1: שם משתמש (Username) -->
-                    <div class="space-y-1.5">
-                        <div class="flex items-center justify-between">
-                            <label class="block font-headline-sm text-body-sm font-semibold text-on-surface" for="username">
-                                שם משתמש
-                            </label>
-                            <span class="font-label-sm text-label-sm text-outline">באנגלית / מספרים בלבד</span>
-                        </div>
-                        <div class="relative rounded-xl bg-surface-container-lowest/80 border border-outline-variant/60 input-ambient-glow focus-within:border-primary-container transition-all">
-                            <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-outline">
-                                <span class="material-symbols-outlined text-[20px]">person</span>
-                            </div>
-                            <input class="w-full bg-transparent border-0 py-3 pr-11 pl-4 text-on-surface font-label-md text-label-md placeholder:text-outline-variant focus:ring-0 focus:outline-none text-left" dir="ltr" id="username" name="username" placeholder="e.g. shred_master" type="text">
-                        </div>
-                    </div>
-                    <!-- Field 2: כתובת אימייל (Email) -->
-                    <div class="space-y-1.5">
-                        <label class="block font-headline-sm text-body-sm font-semibold text-on-surface" for="email">
-                            כתובת אימייל
-                        </label>
-                        <div class="relative rounded-xl bg-surface-container-lowest/80 border border-outline-variant/60 input-ambient-glow focus-within:border-primary-container transition-all">
-                            <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-outline">
-                                <span class="material-symbols-outlined text-[20px]">mail</span>
-                            </div>
-                            <input class="w-full bg-transparent border-0 py-3 pr-11 pl-4 text-on-surface font-label-md text-label-md placeholder:text-outline-variant focus:ring-0 focus:outline-none text-left" dir="ltr" id="email" name="email" placeholder="yourname@domain.com" type="email">
-                        </div>
-                    </div>
-                    <!-- Field 3: סיסמה (Password) with Strength Bar -->
-                    <div class="space-y-1.5">
-                        <div class="flex items-center justify-between">
-                            <label class="block font-headline-sm text-body-sm font-semibold text-on-surface" for="password">
-                                סיסמה
-                            </label>
-                            <span class="font-label-sm text-label-sm text-secondary font-medium">מינימום 8 תווים</span>
-                        </div>
-                        <div class="relative rounded-xl bg-surface-container-lowest/80 border border-outline-variant/60 input-ambient-glow focus-within:border-primary-container transition-all">
-                            <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-outline">
-                                <span class="material-symbols-outlined text-[20px]">lock</span>
-                            </div>
-                            <input class="w-full bg-transparent border-0 py-3 pr-11 pl-11 text-on-surface font-label-md text-label-md placeholder:text-outline-variant focus:ring-0 focus:outline-none text-left" dir="ltr" id="password" name="password" placeholder="••••••••••••" type="password">
-                            <button aria-label="הצג סיסמה" class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-outline hover:text-on-surface transition-colors" type="button">
-                                <span class="material-symbols-outlined text-[20px]">visibility</span>
-                            </button>
-                        </div>
-                        <!-- Password Strength Bar Component -->
-                        <div class="pt-1.5 space-y-1">
-                            <div class="flex gap-1.5 h-1.5 w-full">
-                                <div class="w-1/3 bg-primary-container rounded-full shadow-[0_0_8px_rgba(0,229,255,0.6)]"></div>
-                                <div class="w-1/3 bg-primary-container rounded-full shadow-[0_0_8px_rgba(0,229,255,0.6)]"></div>
-                                <div class="w-1/3 bg-outline-variant/40 rounded-full"></div>
-                            </div>
-                            <div class="flex items-center justify-between font-label-sm text-label-sm">
-                                <span class="text-on-surface-variant">חוזק סיסמה: <strong class="text-primary-container">טובה (חזקה לריפים מהירים)</strong></span>
-                                <span class="text-outline">67%</span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Field 4: אימות סיסמה (Confirm Password) -->
-                    <div class="space-y-1.5">
-                        <label class="block font-headline-sm text-body-sm font-semibold text-on-surface" for="confirm-password">
-                            אימות סיסמה
-                        </label>
-                        <div class="relative rounded-xl bg-surface-container-lowest/80 border border-outline-variant/60 input-ambient-glow focus-within:border-primary-container transition-all">
-                            <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-outline">
-                                <span class="material-symbols-outlined text-[20px]">verified_user</span>
-                            </div>
-                            <input class="w-full bg-transparent border-0 py-3 pr-11 pl-4 text-on-surface font-label-md text-label-md placeholder:text-outline-variant focus:ring-0 focus:outline-none text-left" dir="ltr" id="confirm-password" name="confirm-password" placeholder="••••••••••••" type="password">
-                        </div>
-                    </div>
-                    <!-- Bonus: Instrument Selection Pills -->
-                    <div class="space-y-2 pt-1">
-                        <div class="flex items-center justify-between">
-                            <span class="block font-headline-sm text-body-sm font-semibold text-on-surface">כלי נגינה עיקרי</span>
-                            <span class="font-label-sm text-label-sm text-outline">התאמת המאגר לצרכים שלך</span>
-                        </div>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                            <!-- Pill 1 (Active Default: Electric Guitar) -->
-                            <label class="relative flex items-center justify-center p-2.5 rounded-xl cursor-pointer select-none border border-primary-container/60 bg-primary-container/10 text-primary-container shadow-[0_0_12px_rgba(0,229,255,0.2)] transition-all">
-                                <input checked="" class="sr-only" name="instrument" type="radio" value="electric_guitar">
-                                <div class="flex flex-col items-center gap-1 text-center">
-                                    <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">music_note</span>
-                                    <span class="font-label-sm text-label-sm font-semibold">גיטרה חשמלית</span>
-                                </div>
-                            </label>
-                            <!-- Pill 2: Bass -->
-                            <label class="relative flex items-center justify-center p-2.5 rounded-xl cursor-pointer select-none border border-outline-variant/40 bg-surface-container/50 text-on-surface-variant hover:border-outline hover:text-on-surface transition-all">
-                                <input class="sr-only" name="instrument" type="radio" value="bass">
-                                <div class="flex flex-col items-center gap-1 text-center">
-                                    <span class="material-symbols-outlined text-[20px]">graphic_eq</span>
-                                    <span class="font-label-sm text-label-sm">בס</span>
-                                </div>
-                            </label>
-                            <!-- Pill 3: Drums -->
-                            <label class="relative flex items-center justify-center p-2.5 rounded-xl cursor-pointer select-none border border-outline-variant/40 bg-surface-container/50 text-on-surface-variant hover:border-outline hover:text-on-surface transition-all">
-                                <input class="sr-only" name="instrument" type="radio" value="drums">
-                                <div class="flex flex-col items-center gap-1 text-center">
-                                    <span class="material-symbols-outlined text-[20px]">radio</span>
-                                    <span class="font-label-sm text-label-sm">תופים</span>
-                                </div>
-                            </label>
-                            <!-- Pill 4: Acoustic Guitar -->
-                            <label class="relative flex items-center justify-center p-2.5 rounded-xl cursor-pointer select-none border border-outline-variant/40 bg-surface-container/50 text-on-surface-variant hover:border-outline hover:text-on-surface transition-all">
-                                <input class="sr-only" name="instrument" type="radio" value="acoustic_guitar">
-                                <div class="flex flex-col items-center gap-1 text-center">
-                                    <span class="material-symbols-outlined text-[20px]">queue_music</span>
-                                    <span class="font-label-sm text-label-sm">גיטרה אקוסטית</span>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                    <!-- Terms Agreement Checkbox -->
-                    <!-- Primary Submit Action Button -->
-                    <div class="pt-3">
-                        <button class="w-full py-3.5 px-6 rounded-xl bg-primary-container hover:bg-primary-fixed-dim text-surface-container-lowest font-headline-sm text-headline-sm font-bold flex items-center justify-center gap-2 neon-cyan-btn active:scale-[0.98] transition-all duration-150 tracking-wide cursor-pointer" type="submit">
-                            <span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">bolt</span>
-                            <span class="">צור חשבון</span>
-                        </button>
-                    </div>
-                </form>
-                <!-- Divider with Ambient Tag -->
-                <div class="relative my-6">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-outline-variant/30"></div>
-                    </div>
-                    <div class="relative flex justify-center text-xs uppercase">
-                        <span class="bg-surface-container-low px-3 text-outline font-label-sm text-label-sm">גישה מיידית לקהילת המאסטרים</span>
+<PageTitle>הרשמה ל-instruMETAL | הצטרפו לקהילת המטאל והרוק המתקדם</PageTitle>
+
+<!-- Atmospheric Background Ambient Lights -->
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute -top-44 left-1/2 -translate-x-1/2 w-[800px] h-[550px] bg-purple-900/20 rounded-full blur-[160px]"></div>
+    <div class="absolute -bottom-36 -left-20 w-[500px] h-[500px] bg-[#4c1d95]/15 rounded-full blur-[150px]"></div>
+    <div class="absolute -bottom-24 -right-24 w-[450px] h-[450px] bg-[#2e1065]/25 rounded-full blur-[140px]"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(rgba(168,85,247,0.04)_1px,transparent_1px)] [background-size:32px_32px]"></div>
+</div>
+
+<!-- Main Registration Section -->
+<main class="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-10 md:py-16 relative z-10">
+    <div class="w-full max-w-lg mx-auto">
+        <div class="relative bg-[#0d0a15]/90 backdrop-blur-2xl p-7 sm:p-9 border border-purple-500/15 shadow-[0_20px_50px_rgba(0,0,0,0.85)] purple-subtle-glow overflow-hidden rounded-3xl">
+            <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-80 h-40 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- Title & Logo -->
+            <div class="text-center mb-7 relative z-10">
+                <div class="inline-flex items-center justify-center mb-3">
+                    <div class="relative flex items-center justify-center p-2 rounded-2xl bg-purple-950/20 border border-purple-500/20 shadow-[0_0_24px_rgba(124,58,237,0.25)]">
+                        <img src="images/InstrumentalLogo.png" alt="instruMETAL Logo" class="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-[0_0_16px_rgba(168,85,247,0.45)]">
                     </div>
                 </div>
-                <!-- Bottom Link (Already Registered -> Login) -->
-                <div class="text-center pt-1">
-                    <p class="font-body-md text-body-md text-on-surface-variant">
-                        כבר רשום למערכת?
-                        <a class="font-headline-sm text-body-md font-semibold text-primary-container hover:underline hover:brightness-125 transition-all mr-1.5 inline-flex items-center gap-1" href="#">
-                            <span class="">התחבר כאן</span>
-                            <span class="material-symbols-outlined text-[16px] rtl:rotate-180">arrow_forward</span>
-                        </a>
-                    </p>
-                </div>
+                <div class="font-headline-sm text-xs font-semibold tracking-widest uppercase text-purple-400/90 mb-1">instruMETAL</div>
+                <h1 class="font-headline-lg text-2xl font-bold text-white tracking-tight mt-1 mb-2">הרשמה ל-instruMETAL</h1>
+                <p class="font-body-md text-xs text-on-surface-variant max-w-sm mx-auto leading-relaxed">
+                    הצטרפו למאגר הטאבים והלימוד המקצועי לגיטרה, בס ותופים
+                </p>
             </div>
-            <!-- Trust Badges & Tech Specs Preview Under Card -->
 
+            <!-- Error / Success Alerts -->
+            @if (errorMessage != null)
+            {
+                <div class="p-3 mb-4 rounded-xl bg-red-950/40 border border-red-500/30 text-red-300 font-body-md text-xs">
+                    @errorMessage
+                </div>
+            }
+
+            @if (isRegistered)
+            {
+                <div class="p-3 mb-4 rounded-xl bg-purple-950/40 border border-purple-500/40 text-purple-200 font-body-md text-xs">
+                    <strong>ההרשמה הצליחה!</strong> מעבירים אותך לדף הכניסה בעוד <strong>@secondsLeft</strong> שניות...
+                </div>
+            }
+
+            <!-- Form -->
+            <form class="space-y-4 relative z-10" @onsubmit:preventDefault>
+                
+                <!-- Username -->
+                <Field Id="username"
+                       Label="שם משתמש"
+                       Hint="באנגלית ומספרים בלבד"
+                       Icon="person"
+                       Placeholder="e.g. shred_master"
+                       @bind-Value="username" />
+
+                <!-- Email -->
+                <Field Id="email"
+                       Label="כתובת אימייל"
+                       Icon="mail"
+                       Type="email"
+                       Placeholder="yourname@domain.com"
+                       @bind-Value="email" />
+
+                <!-- Password -->
+                <Field Id="password"
+                       Label="סיסמה"
+                       Hint="מינימום 8 תווים"
+                       Icon="lock"
+                       Type="password"
+                       Placeholder="••••••••••••"
+                       @bind-Value="password" />
+
+                <!-- Confirm Password -->
+                <Field Id="confirm-password"
+                       Label="אימות סיסמה"
+                       Icon="verified_user"
+                       Type="password"
+                       Placeholder="••••••••••••"
+                       @bind-Value="confirmPassword" />
+
+                <!-- Submit Button -->
+                <div class="pt-3">
+                    <button type="button"
+                            disabled="@(isBusy || isRegistered)"
+                            @onclick="RegisterAsync"
+                            class="w-full py-3 px-6 bg-gradient-to-r from-purple-700 via-purple-600 to-purple-700 hover:from-purple-600 hover:via-purple-500 hover:to-purple-600 text-white font-headline-sm text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-200 tracking-wide cursor-pointer purple-button-glow border border-purple-400/25 active:scale-[0.99] rounded-xl disabled:opacity-50">
+                        <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">bolt</span>
+                        <span>@(isBusy ? "בודקים..." : "צור חשבון")</span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="relative my-5">
+                <div class="w-full border-t border-white/5"></div>
+            </div>
+
+            <!-- Login Link -->
+            <div class="text-center">
+                <p class="font-body-md text-xs text-on-surface-variant">
+                    כבר רשום למערכת? 
+                    <a href="login" class="font-headline-sm text-xs font-semibold text-purple-400 hover:text-purple-300 hover:underline transition-all mr-1.5 inline-flex items-center gap-1">
+                        <span>התחבר כאן</span>
+                        <span class="material-symbols-outlined text-[14px] rtl:rotate-180">arrow_forward</span>
+                    </a>
+                </p>
+            </div>
         </div>
-    </main>
-    <!-- SHARED COMPONENT: Footer -->
-    <!-- Micro-Interactions Script for Instrument Selection Pills -->
-    <script>
-            document.querySelectorAll('input[name="instrument"]').forEach((radio) => {
-              radio.addEventListener('change', (e) => {
-                document.querySelectorAll('input[name="instrument"]').forEach((r) => {
-                  const pill = r.closest('label');
-                  if (r.checked) {
-                    pill.className = "relative flex items-center justify-center p-2.5 rounded-xl cursor-pointer select-none border border-primary-container/60 bg-primary-container/10 text-primary-container shadow-[0_0_12px_rgba(0,229,255,0.2)] transition-all";
-                    const icon = pill.querySelector('.material-symbols-outlined');
-                    if (icon) icon.style.fontVariationSettings = "'FILL' 1";
-                  } else {
-                    pill.className = "relative flex items-center justify-center p-2.5 rounded-xl cursor-pointer select-none border border-outline-variant/40 bg-surface-container/50 text-on-surface-variant hover:border-outline hover:text-on-surface transition-all";
-                    const icon = pill.querySelector('.material-symbols-outlined');
-                    if (icon) icon.style.fontVariationSettings = "'FILL' 0";
-                  }
-                });
-              });
-            });
-    </script>
+    </div>
+</main>
 
+@code {
+    private string username = string.Empty;
+    private string email = string.Empty;
+    private string password = string.Empty;
+    private string confirmPassword = string.Empty;
 
-</body></html>
+    private string? errorMessage;
+    private bool isBusy = false;
+    private bool isRegistered = false;
+    private int secondsLeft = 5;
+
+    private async Task RegisterAsync()
+    {
+        errorMessage = null;
+
+        // 1. בדיקות תקינות קלט ב-C#
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(email) ||
+            string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(confirmPassword))
+        {
+            errorMessage = "יש למלא את כל השדות.";
+            return;
+        }
+
+        if (!MailAddress.TryCreate(email.Trim(), out _))
+        {
+            errorMessage = "כתובת האימייל לא תקינה.";
+            return;
+        }
+
+        if (password != confirmPassword)
+        {
+            errorMessage = "הסיסמה ואימות הסיסמה לא זהים.";
+            return;
+        }
+
+        isBusy = true;
+
+        try
+        {
+            // 2. קריאה ל-API לבדיקת קיומם של שם המשתמש והאימייל
+            bool usernameExists = await Http.GetFromJsonAsync<bool>(
+                $"api/users/exists/{Uri.EscapeDataString(username.Trim())}");
+            
+            if (usernameExists)
+            {
+                errorMessage = "שם המשתמש כבר תפוס. בחרו שם אחר.";
+                return;
+            }
+
+            bool emailExists = await Http.GetFromJsonAsync<bool>(
+                $"api/users/email-exists/{Uri.EscapeDataString(email.Trim())}");
+            
+            if (emailExists)
+            {
+                errorMessage = "האימייל הזה כבר רשום במערכת.";
+                return;
+            }
+
+            // 3. שמירת המשתמש ב-API
+            User newUser = new User(username.Trim(), email.Trim(), password);
+            HttpResponseMessage response = await Http.PostAsJsonAsync("api/users", newUser);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                errorMessage = "ההרשמה נכשלה. נסו שוב.";
+                return;
+            }
+        }
+        catch (HttpRequestException)
+        {
+            errorMessage = "השרת לא זמין כרגע. נסו שוב בעוד רגע.";
+            return;
+        }
+        finally
+        {
+            isBusy = false;
+        }
+
+        // 4. ספירה לאחור ומעבר לדף הכניסה
+        isRegistered = true;
+        while (secondsLeft > 0)
+        {
+            StateHasChanged();
+            await Task.Delay(1000);
+            secondsLeft--;
+        }
+
+        Navigation.NavigateTo("login");
+    }
+}

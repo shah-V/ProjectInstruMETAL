@@ -7,10 +7,18 @@ namespace DAL
         // מתודה ראשית להרצת כל שלבי האתחול
         public static async Task InitializeAsync(string connectionString, string serverConnectionString)
         {
+            // 1. יצירת בסיס הנתונים מול השרת הכללי
             await CreateDatabaseAsync(serverConnectionString);
-            await CreateTablesAsync(connectionString);
-            await SeedRolesAsync(connectionString);
-            await SeedUsersAsync(connectionString);
+
+            // 2. הבטחה שמחרוזת החיבור לשלבים הבאים תכיל את instruMETALDB
+            string dbConnectionString = connectionString.Contains("Database=", StringComparison.OrdinalIgnoreCase)
+                ? connectionString
+                : connectionString.TrimEnd(';') + ";Database=instruMETALDB;";
+
+            // 3. הרצת יצירת הטבלאות והזנת נתוני הבדיקה בתוך instruMETALDB
+            await CreateTablesAsync(dbConnectionString);
+            await SeedRolesAsync(dbConnectionString);
+            await SeedUsersAsync(dbConnectionString);
         }
 
         // יצירת בסיס הנתונים instruMETALDB במידה ואינו קיים בשרת

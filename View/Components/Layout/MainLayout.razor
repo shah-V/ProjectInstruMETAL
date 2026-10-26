@@ -8,36 +8,11 @@
         <div class="absolute -bottom-20 right-1/4 w-[600px] h-[600px] rounded-full bg-primary-container/5 blur-[160px]"></div>
     </div>
 
-    <!-- SHARED COMPONENT: TopNavBar -->
-    <header class="docked full-width top-0 sticky z-50 bg-surface-container-low/75 backdrop-blur-md border-b border-outline-variant/30 shadow-[0_4px_24px_-2px_rgba(0,0,0,0.6)]">
-        <div class="w-full px-margin md:px-margin max-w-7xl mx-auto flex items-center justify-between h-16 dir-rtl">
-            <!-- Right: Brand Logo & Navigation Links -->
-            <div class="flex items-center gap-space-lg">
-                <Logo />
-                <nav class="hidden md:flex items-center gap-space-md">
-                    <a class="text-primary-container border-b-2 border-primary-container pb-1 font-label-md text-label-md" href="/">טאבים</a>
-                    <a class="text-on-surface-variant font-label-md text-label-md hover:text-primary-container transition-colors" href="#">מאגר שירים</a>
-                    <a class="text-on-surface-variant font-label-md text-label-md hover:text-primary-container transition-colors" href="#">מורים</a>
-                    <a class="text-on-surface-variant font-label-md text-label-md hover:text-primary-container transition-colors" href="#">אודות</a>
-                </nav>
-            </div>
-            <!-- Left: Search & Trailing Actions -->
-            <div class="flex items-center gap-space-md">
-                <div class="hidden sm:flex items-center gap-2 bg-surface-container-lowest/80 border border-outline-variant/40 rounded-lg px-3 py-1.5 focus-within:border-primary-container transition-colors">
-                    <span class="material-symbols-outlined text-outline text-[18px]">search</span>
-                    <input class="bg-transparent text-body-sm font-body-sm text-on-surface placeholder:text-outline focus:outline-none w-36 lg:w-48 dir-rtl" placeholder="חיפוש שיר, ריף או אמן..." type="text">
-                </div>
-                <a class="hidden sm:inline-flex items-center px-4 py-2 rounded-lg border border-outline-variant/60 text-on-surface font-label-md text-label-md hover:border-primary-container/80 hover:text-primary-container transition-colors duration-150" href="/login">
-                    התחברות
-                </a>
-                <a class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary-container text-surface-container-lowest font-headline-sm text-headline-sm font-bold neon-cyan-glow hover:bg-primary-fixed-dim transition-all duration-150" href="/register">
-                    <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">electric_bolt</span>
-                    הרשמה בחינם
-                </a>
-            </div>
-        </div>
-    </header>
+    <!-- סרגל הניווט העליון המשותף -->
+    <NavMenu />
 
     <!-- תוכן הדף הדינמי -->
-    @Body
+    <main class="flex-1 flex flex-col relative z-10">
+        @Body
+    </main>
 </div>

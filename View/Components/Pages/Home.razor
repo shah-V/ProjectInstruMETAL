@@ -1,456 +1,160 @@
 ﻿@page "/"
-@inject HttpClient Http
 
-<!DOCTYPE html><html class="dark" dir="rtl" lang="he" style=""><head>
-<meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>instruMETAL - פלטפורמת טאבים ולימוד למטאל ורוק</title>
-<!-- Google Fonts: Rubik & JetBrains Mono -->
-<link href="https://fonts.googleapis.com" rel="preconnect">
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;family=Rubik:ital,wght@0,300..900;1,300..900&amp;display=swap" rel="stylesheet">
-<!-- Material Symbols Outlined -->
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<!-- Tailwind CSS with Forms & Container Queries -->
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<!-- Tailwind Configuration Script -->
-<script id="tailwind-config">
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          "colors": {
-            "on-error": "#690005",
-            "primary-fixed-dim": "#00daf3",
-            "surface-bright": "#39393b",
-            "on-error-container": "#ffdad6",
-            "tertiary": "#f8e7ff",
-            "on-tertiary-fixed": "#2e004e",
-            "secondary-fixed": "#ffdeac",
-            "on-primary-fixed-variant": "#004f58",
-            "outline-variant": "#3b494c",
-            "secondary": "#ffd799",
-            "on-tertiary": "#4c007d",
-            "tertiary-fixed-dim": "#e0b6ff",
-            "surface-container-lowest": "#0e0e10",
-            "tertiary-container": "#e6c3ff",
-            "on-secondary": "#432c00",
-            "on-tertiary-fixed-variant": "#6a0baa",
-            "surface-container-highest": "#353437",
-            "surface-container-low": "#1b1b1d",
-            "surface-dim": "#131315",
-            "on-primary": "#00363d",
-            "inverse-on-surface": "#303032",
-            "inverse-primary": "#006875",
-            "surface-tint": "#00daf3",
-            "error": "#ffb4ab",
-            "secondary-container": "#feb300",
-            "surface": "#131315",
-            "background": "#131315",
-            "surface-container-high": "#2a2a2c",
-            "on-secondary-container": "#6a4800",
-            "on-surface": "#e5e1e4",
-            "surface-variant": "#353437",
-            "outline": "#849396",
-            "primary-fixed": "#9cf0ff",
-            "on-secondary-fixed-variant": "#604100",
-            "on-background": "#e5e1e4",
-            "inverse-surface": "#e5e1e4",
-            "on-primary-fixed": "#001f24",
-            "on-secondary-fixed": "#281900",
-            "on-tertiary-container": "#7e2cbe",
-            "tertiary-fixed": "#f2daff",
-            "on-surface-variant": "#bac9cc",
-            "on-primary-container": "#00626e",
-            "primary-container": "#00e5ff",
-            "error-container": "#93000a",
-            "primary": "#c3f5ff",
-            "secondary-fixed-dim": "#ffba38",
-            "surface-container": "#201f21"
-          },
-          "borderRadius": {
-            "DEFAULT": "0.125rem",
-            "lg": "0.25rem",
-            "xl": "0.5rem",
-            "full": "0.75rem"
-          },
-          "spacing": {
-            "space-xl": "2.5rem",
-            "space-lg": "1.5rem",
-            "margin-mobile": "1rem",
-            "margin": "2rem",
-            "gutter": "1.25rem",
-            "space-sm": "0.5rem",
-            "space-xs": "0.25rem",
-            "gutter-mobile": "0.75rem",
-            "space-md": "1rem"
-          },
-          "fontFamily": {
-            "headline-md": ["Rubik"],
-            "headline-sm": ["Rubik"],
-            "label-lg": ["JetBrains Mono"],
-            "label-sm": ["JetBrains Mono"],
-            "headline-lg-mobile": ["Rubik"],
-            "body-lg": ["Rubik"],
-            "headline-xl": ["Rubik"],
-            "body-md": ["Rubik"],
-            "label-md": ["JetBrains Mono"],
-            "headline-xl-mobile": ["Rubik"],
-            "headline-lg": ["Rubik"],
-            "body-sm": ["Rubik"]
-          },
-          "fontSize": {
-            "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
-            "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
-            "label-lg": ["15px", { "lineHeight": "22px", "fontWeight": "600" }],
-            "label-sm": ["11px", { "lineHeight": "16px", "fontWeight": "500" }],
-            "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
-            "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
-            "headline-xl": ["40px", { "lineHeight": "48px", "fontWeight": "800" }],
-            "body-md": ["15px", { "lineHeight": "24px", "fontWeight": "400" }],
-            "label-md": ["13px", { "lineHeight": "18px", "fontWeight": "500" }],
-            "headline-xl-mobile": ["30px", { "lineHeight": "38px", "fontWeight": "800" }],
-            "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
-            "body-sm": ["13px", { "lineHeight": "20px", "fontWeight": "400" }]
-          }
-        }
-      }
-    }
-  </script>
-<style>
-    body {
-      background-color: #0F0F11;
-      color: #e5e1e4;
-      font-family: 'Rubik', sans-serif;
-      overflow-x: hidden;
-    }
-    .neon-cyan-glow {
-      box-shadow: 0 0 20px rgba(0, 229, 255, 0.45);
-    }
-    .neon-amber-glow {
-      box-shadow: 0 0 16px rgba(254, 179, 0, 0.4);
-    }
-    .glass-panel {
-      background: rgba(26, 26, 30, 0.72);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    .glass-panel-deep {
-      background: rgba(20, 20, 24, 0.88);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-    }
-    .cyan-edge-glow {
-      border: 1px solid rgba(0, 229, 255, 0.4);
-      box-shadow: 0 0 24px -4px rgba(0, 229, 255, 0.25);
-    }
-  </style>
-</head>
-<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col relative selection:bg-primary-container selection:text-surface-container-lowest">
-<!-- Ambient Obsidian Stage Lights Background -->
-<div class="fixed inset-0 pointer-events-none z-0">
-<div class="absolute -top-32 right-10 w-[550px] h-[550px] rounded-full bg-primary-container/10 blur-[130px]"></div>
-<div class="absolute top-[35%] left-0 w-[450px] h-[450px] rounded-full bg-secondary-container/10 blur-[140px]"></div>
-<div class="absolute -bottom-20 right-1/4 w-[600px] h-[600px] rounded-full bg-primary-container/5 blur-[160px]"></div>
+<PageTitle>instruMETAL - פלטפורמת טאבים ולימוד למטאל ורוק</PageTitle>
+
+<!-- Ambient Aura Background -->
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden aura-purple-radial">
+    <div class="absolute -top-40 right-1/4 w-[650px] h-[650px] rounded-full bg-primary/5 blur-[160px]"></div>
+    <div class="absolute top-1/2 left-10 w-[500px] h-[500px] rounded-full bg-primary-dark/6 blur-[180px]"></div>
 </div>
 
-<!-- Main Content Flow -->
-<main class="flex-grow z-10 w-full max-w-7xl mx-auto px-margin-mobile md:px-margin space-y-space-xl py-space-lg">
-<!-- 1. HERO SECTION (7/5 Split Grid) -->
-<section class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-center pt- space-md pb-space-lg">
-<!-- Right Column (7/12 in RTL): Main Messaging -->
-<div class="lg:col-span-7 flex flex-col justify-center space-y-space-md">
+<!-- Main Content -->
+<main class="flex-grow z-10 w-full max-w-6xl mx-auto px-6 md:px-10 py-12 md:py-16 space-y-24">
+    <!-- Hero Section -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+        <div class="lg:col-span-7 flex flex-col justify-center space-y-6">
+            <div class="inline-flex items-center gap-2 self-start px-3.5 py-1.5 rounded-full border border-purple-900/40 bg-purple-950/25 text-accent font-mono text-[11px] tracking-wide">
+                <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
+                <span>פלטפורמה מקצועית ללימוד נגינה וטאבים אינטראקטיביים</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-semibold tracking-tight text-text-primary leading-[1.25]">
+                פלטפורמה מתקדמת ללימוד נגינה <span class="text-accent font-medium">וטאבים למוזיקת רוק ומטאל</span>
+            </h1>
+            <p class="text-text-secondary text-sm md:text-base leading-relaxed max-w-xl font-normal">
+                מאגר טאבים אינטראקטיבי ומדויק בליווי כלים מתקדמים לשליטה בקצב, בידוד ערוצים ותרגול מובנה בהנחיית מורים מובילים.
+            </p>
+            <div class="flex flex-wrap items-center gap-3.5 pt-2 font-mono">
+                <a class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-primary hover:bg-primary-deep text-white text-xs font-medium border border-purple-400/30 transition-all duration-150 shadow-lg shadow-primary/20" href="register">
+                    <span class="material-symbols-outlined ml-2 text-[18px]">play_arrow</span>התחלת למידה
+                </a>
+                <a class="inline-flex items-center justify-center px-6 py-3 rounded-xl border border-white/[0.08] hover:border-white/20 bg-surface/50 text-text-secondary hover:text-text-primary text-xs transition-all duration-150" href="#">
+                    צפייה בסרטון הדגמה (1:30)
+                </a>
+            </div>
+            <div class="pt-4 flex flex-wrap items-center gap-6 text-text-faint font-mono text-xs border-t border-white/[0.06] max-w-xl">
+                <span class="flex items-center gap-2 text-text-secondary"><span class="text-accent text-[12px]">✦</span>למעלה מ-15,000 טאבים אינטראקטיביים מאומתים</span>
+                <span class="text-white/10">/</span>
+                <span class="flex items-center gap-2 text-text-secondary"><span class="text-accent text-[12px]">★</span>דירוג 4.9 בקרב נגנים מקצועיים</span>
+            </div>
+        </div>
 
-<h1 class="font-headline-xl text-headline-xl text-on-surface font-extrabold tracking-tight leading-tight">
-          למד לנגן עם <span class="text-primary-container drop-shadow-[0_0_24px_rgba(0,229,255,0.4)]">הטאבים המדויקים ביותר</span> בישראל
-        </h1>
-<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed max-w-2xl">
-          פלטפורמת הטאבים והלימוד המתקדמת לרוק, מטאל ומוזיקה כבדה. מאגר עצום של טאבים אינטראקטיביים, סינכרון עם אודיו, שליטה בקצב וליווי צמוד של מורים מובילים.
-        </p>
-<!-- CTA Buttons side by side -->
-<div class="flex flex-wrap items-center gap-space-md pt-space-xs">
-<a class="inline-flex items-center justify-center px-space-lg py-3 rounded-lg bg-primary-container text-surface-container-lowest font-headline-sm text-headline-sm font-bold neon-cyan-glow hover:bg-primary-fixed-dim transition-all duration-200 active:scale-[0.98]" href="#">
-<span class="material-symbols-outlined ml-2" style="font-variation-settings: &quot;FILL&quot; 1;">play_arrow</span>
-            התחל להתאמן בחינם
-          </a>
-<a class="inline-flex items-center justify-center px-space-lg py-3 rounded-lg glass-panel text-on-surface font-headline-sm text-headline-sm hover:border-primary-container/50 hover:text-primary-container transition-all duration-200 active:scale-[0.98]" href="#">
-<span class="material-symbols-outlined ml-2 text-outline-variant">login</span>
-            כניסה למערכת
-          </a>
-</div>
-<!-- Trust Metrics -->
-<div class="pt-space-sm flex flex-wrap items-center gap-4 text-on-surface-variant font-label-md text-label-md border-t border-outline-variant/20 max-w-xl">
-<span class="flex items-center gap-1.5 text-on-surface">
-<span class="text-secondary-container"></span>
-            מעל 15,000 טאבים מאומתים
-          </span>
-<span class="text-outline-variant">|</span>
-<span class="flex items-center gap-1.5 text-on-surface">
-<span class="text-primary-container"></span>
-            4.9 דירוג משתמשים (2,400+ ביקורות)
-          </span>
-</div>
-</div>
-<!-- Left Column (5/12 in RTL): Interactive Frosted Glass Practice Card -->
-<div class="lg:col-span-5">
-<div class="glass-panel-deep rounded-xl p-space-md lg:p-space-lg border border-outline-variant/40 relative overflow-hidden shadow-2xl"><div class="flex items-center justify-between pb-2 mb-2 border-b border-outline-variant/20 text-label-sm font-label-sm text-outline"><span class="flex items-center gap-1.5 text-primary-container"><span class="material-symbols-outlined text-[14px]">preview</span>הדגמת הנגן האינטראקטיבי</span><span class="px-2 py-0.5 rounded bg-surface-container-high text-[11px] text-outline-variant border border-outline-variant/30">תמונה להמחשה</span></div>
-<!-- Background accent pip -->
-<div class="absolute -top-12 -left-12 w-36 h-36 bg-secondary-container/20 rounded-full blur-2xl pointer-events-none"></div>
-<!-- Card Header -->
-<div class="flex items-start justify-between border-b border-outline-variant/30 pb-space-sm">
-<div>
-<span class="font-label-sm text-label-sm text-outline tracking-wider">טאב אימון פעיל</span>
-<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold mt-0.5">Master of Puppets</h2>
-<span class="font-body-sm text-body-sm text-on-surface-variant">Metallica • Downpicking Workout</span>
-</div>
-<!-- Amber Gold BPM Indicator Badge -->
-<div class="px-3 py-1.5 rounded-lg bg-surface-container-lowest/90 border border-secondary-container/50 text-secondary-container font-label-lg text-label-lg font-bold flex items-center gap-1 neon-amber-glow">
-<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: &quot;FILL&quot; 1;">speed</span>
-<span class="">212 BPM</span>
-</div>
-</div>
-<!-- Tab Visualization Mockup Canvas -->
-<div class="mt-space-md p-space-sm rounded-lg bg-surface-container-lowest/90 border border-outline-variant/40 font-label-sm text-label-sm overflow-x-hidden relative">
-<div class="flex items-center justify-between text-outline text-[11px] mb-1">
-<span class="">תיבה 24/118</span>
-<span class="">E Standard Tuning (E B G D A E)</span>
-</div>
-<!-- Tab Strings Diagram -->
-<div class="space-y-1.5 py-1 select-none font-mono text-[12px] text-on-surface-variant">
-<div class="flex items-center gap-2 border-b border-outline-variant/20 pb-0.5">
-<span class="w-3 text-outline text-[10px]">E</span>
-<span class="text-outline-variant">---------------------------------</span>
-</div>
-<div class="flex items-center gap-2 border-b border-outline-variant/20 pb-0.5">
-<span class="w-3 text-outline text-[10px]">B</span>
-<span class="text-outline-variant">---------------------------------</span>
-</div>
-<div class="flex items-center gap-2 border-b border-outline-variant/20 pb-0.5">
-<span class="w-3 text-outline text-[10px]">G</span>
-<span class="text-outline-variant">---------------------------------</span>
-</div>
-<div class="flex items-center gap-2 border-b border-outline-variant/20 pb-0.5">
-<span class="w-3 text-outline text-[10px]">D</span>
-<span class="text-outline-variant">---<span class="text-primary-container font-bold bg-primary-container/20 px-1 rounded">7</span>-7---<span class="text-primary-container font-bold bg-primary-container/20 px-1 rounded">8</span>-8---<span class="text-primary-container font-bold bg-primary-container/20 px-1 rounded">7</span>-7--------</span>
-</div>
-<div class="flex items-center gap-2 border-b border-outline-variant/20 pb-0.5">
-<span class="w-3 text-outline text-[10px]">A</span>
-<span class="text-outline-variant">---<span class="text-primary-container font-bold bg-primary-container/20 px-1 rounded">5</span>-5---<span class="text-primary-container font-bold bg-primary-container/20 px-1 rounded">6</span>-6---<span class="text-primary-container font-bold bg-primary-container/20 px-1 rounded">5</span>-5--------</span>
-</div>
-<div class="flex items-center gap-2">
-<span class="w-3 text-outline text-[10px]">E</span>
-<span class="text-outline-variant">-0-0---0-0---0-0---0-0-12\--</span>
-</div>
-</div>
-<!-- Playhead Vertical Luminescent Bar -->
-<div class="absolute top-0 bottom-0 left-1/3 w-[2px] bg-primary-container shadow-[0_0_12px_#00e5ff] pointer-events-none"></div>
-</div>
-<!-- Progress Bar in Amber Gold -->
-<div class="mt-space-md space-y-1">
-<div class="flex justify-between items-center font-label-sm text-label-sm">
-<span class="text-on-surface">התקדמות אימון אישית</span>
-<span class="text-secondary-container font-bold">78% שליטה בריף המרכזי</span>
-</div>
-<div class="w-full h-2 rounded-full bg-surface-container-high overflow-hidden">
-<div class="h-full bg-gradient-to-l from-secondary-container to-secondary-fixed-dim rounded-full transition-all duration-500" style="width: 78%;"></div>
-</div>
-</div>
-<!-- Speed Controller Widget & Difficulty Badge -->
-<div class="mt-space-md flex flex-wrap items-center justify-between gap-space-sm pt-space-sm border-t border-outline-variant/20">
-<div class="flex items-center gap-1.5 font-label-sm text-label-sm text-on-surface-variant">
-<span class="">מהירות:</span>
-<button class="px-2 py-0.5 rounded bg-surface-container hover:bg-surface-bright transition text-on-surface">0.85x</button>
-<button class="px-2 py-0.5 rounded bg-primary-container text-surface-container-lowest font-bold">1.0x</button>
-<button class="px-2 py-0.5 rounded bg-surface-container hover:bg-surface-bright transition text-on-surface">1.2x</button>
-</div>
-<!-- Difficulty Tag -->
-<span class="px-2.5 py-1 rounded bg-tertiary-container/20 border border-tertiary-container/40 text-tertiary font-body-sm text-body-sm flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">local_fire_department</span>
-              רמת קושי: Shred Master
-            </span>
-</div>
-</div>
-</div>
-</section>
-<!-- 2. WHY IT MATTERS SECTION (3 Equal Columns) -->
-<section class="space-y-space-lg py-space-md">
-<div class="text-center max-w-2xl mx-auto space-y-space-xs">
-<h2 class="font-headline-lg text-headline-lg font-bold text-on-surface">
-          למה לנגן וללמוד עם <span class="text-primary-container">instruMETAL</span>?
-        </h2>
-<p class="font-body-md text-body-md text-on-surface-variant">
-          הכלים הטכנולוגיים שנוצרו במיוחד עבור הדרישות של עולם המוזיקה הטכנית והמהירה
-        </p>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-space-lg">
-<!-- Card 1 -->
-<div class="glass-panel rounded-xl p-space-lg border border-outline-variant/30 hover:border-primary-container/40 transition-all duration-300 hover:-translate-y-1 group">
-<div class="w-12 h-12 rounded-lg bg-surface-container-high flex items-center justify-center text-primary-container group-hover:scale-110 group-hover:bg-primary-container/20 transition-all duration-300">
-<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: &quot;FILL&quot; 1;">layers</span>
-</div>
-<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface mt-space-md">
-            טאבים רב-ערוציים (Multi-Instrument)
-          </h3>
-<p class="font-body-md text-body-md text-on-surface-variant mt-space-sm leading-relaxed">
-            טאבים מלאים לגיטרה מובילה, גיטרת קצב, בס ותופים מסונכרנים במקביל. השתק או בודד כל ערוץ כדי לשמוע בדיוק מה שאתה צריך לתרגל.
-          </p>
-</div>
-<!-- Card 2 -->
-<div class="glass-panel rounded-xl p-space-lg border border-outline-variant/30 hover:border-secondary-container/40 transition-all duration-300 hover:-translate-y-1 group">
-<div class="w-12 h-12 rounded-lg bg-surface-container-high flex items-center justify-center text-secondary-container group-hover:scale-110 group-hover:bg-secondary-container/20 transition-all duration-300">
-<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: &quot;FILL&quot; 1;">tune</span>
-</div>
-<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface mt-space-md">
-            שליטה מדויקת בקצב ואימון בלופים
-          </h3>
-<p class="font-body-md text-body-md text-on-surface-variant mt-space-sm leading-relaxed">
-            האטה והאצה של טמפו (BPM) ללא שינוי גובה הצליל, חלוקה לפרקים ואימון קטעי סולו קשים שוב ושוב עד להשגת דיוק מקסימלי.
-          </p>
-</div>
-<!-- Card 3 -->
-<div class="glass-panel rounded-xl p-space-lg border border-outline-variant/30 hover:border-primary-container/40 transition-all duration-300 hover:-translate-y-1 group">
-<div class="w-12 h-12 rounded-lg bg-surface-container-high flex items-center justify-center text-primary-container group-hover:scale-110 group-hover:bg-primary-container/20 transition-all duration-300">
-<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: &quot;FILL&quot; 1;">forum</span>
-</div>
-<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface mt-space-md">
-            חיבור ישיר למורים וקהילת נגנים
-          </h3>
-<p class="font-body-md text-body-md text-on-surface-variant mt-space-sm leading-relaxed">
-            קבלת פידבק אישי על ביצועים, טיפים מנגני מטאל מקצועיים והתקדמות שבועית מובנית שמשאירה אותך ממוקד במטרות השריפה של הפינגרבורד.
-          </p>
-</div>
-</div>
-</section>
-<!-- 3. SONG / CONTENT CARDS SECTION (2 Feature Cards Grid) -->
-<section class="space-y-space-md py-space-md">
-<div class="flex items-center justify-between">
-<div>
-<h2 class="font-headline-lg text-headline-lg font-bold text-on-surface">שירים חמים במאגר השבוע</h2>
-<p class="font-body-md text-body-md text-on-surface-variant">הטאבים הכי מנוגנים על ידי קהילת השרידרים שלנו</p>
-</div>
-<a class="font-label-md text-label-md text-primary-container hover:underline flex items-center gap-1" href="#">
-          לכל השירים
-          <span class="material-symbols-outlined text-[16px]">chevron_left</span>
-</a>
-</div>
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-space-lg">
-<!-- Card 1: Tornado of Souls -->
-<div class="glass-panel rounded-xl overflow-hidden border border-outline-variant/30 hover:border-secondary-container/40 transition-all duration-300 flex flex-col">
-<!-- 16:9 Image Showcase Container -->
-<div class="p-space-lg pb-0 flex items-center justify-between border-b border-outline-variant/20"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-secondary-container text-[24px]">electric_bolt</span><span class="font-label-sm text-label-sm text-secondary-container font-mono">MEGADETH</span></div><div class="flex items-center gap-2"><span class="px-2.5 py-1 rounded bg-secondary-container/20 border border-secondary-container/60 text-secondary-container font-label-sm font-bold flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bolt</span>רמת קושי: מתקדם</span><div class="px-2.5 py-1 rounded bg-secondary-container text-surface-container-lowest font-headline-sm text-headline-sm font-extrabold flex items-center gap-1 neon-amber-glow shadow-lg"><span class="">HOT 🔥</span></div></div></div>
-<!-- Content Details -->
-<div class="p-space-lg flex-1 flex flex-col justify-between space-y-space-md">
-<div>
-<div class="flex items-center justify-between"><span class="font-label-sm text-label-sm text-outline font-mono">195 BPM • 6 מיתרים</span><span class="font-label-sm text-label-sm text-secondary-container font-mono">D Standard Tuning</span></div>
-<h3 class="font-headline-md text-headline-md font-bold text-on-surface mt-1">Tornado of Souls</h3>
-<p class="font-body-md text-body-md text-on-surface-variant mt-1">
-                סולו המופת האייקוני מאת Marty Friedman. דגש על סוויפ-פיקינג מהיר, בנדים מיקרוטונאליים ושליטה מדויקת באוברדרייב.
-              </p>
-</div>
-<div class="pt-space-xs">
-<a class="w-full inline-flex items-center justify-center py-2.5 px-4 rounded-lg bg-surface-container-high hover:bg-secondary-container hover:text-surface-container-lowest text-secondary-container border border-secondary-container/30 font-headline-sm text-headline-sm font-semibold transition-all duration-200" href="#">
-<span class="material-symbols-outlined ml-2 text-[20px]">music_note</span>
-                פתח טאב אינטראקטיבי
-              </a>
-</div>
-</div>
-</div>
-<!-- Card 2: Bleed -->
-<div class="glass-panel rounded-xl overflow-hidden border border-outline-variant/30 hover:border-primary-container/40 transition-all duration-300 flex flex-col"><div class="p-space-lg pb-0 flex items-center justify-between border-b border-outline-variant/20"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-error text-[24px]">bolt</span><span class="font-label-sm text-label-sm text-error font-mono">SLIPKNOT</span></div><div class="flex items-center gap-2"><span class="px-2.5 py-1 rounded bg-error-container/30 border border-error text-error font-label-sm font-bold flex items-center gap-1 shadow-[0_0_12px_rgba(255,180,171,0.35)]"><span class="material-symbols-outlined text-[14px]">local_fire_department</span>רמת קושי: קשה מאוד</span></div></div><div class="p-space-lg flex-1 flex flex-col justify-between space-y-space-md"><div><div class="flex items-center justify-between"><span class="font-label-sm text-label-sm text-outline font-mono">135 BPM • 6 מיתרים</span><span class="font-label-sm text-label-sm text-primary-container font-mono">Drop A Tuning</span></div><h3 class="font-headline-md text-headline-md font-bold text-on-surface mt-1">Psychosocial</h3><p class="font-body-md text-body-md text-on-surface-variant mt-1">ריפים כבדים ומדויקים של פריטה מהירה ביד ימין, סולו מלודי עוצמתי של Mick Thomson ו-Jim Root וסנכרון תופים אגרסיבי במיוחד.</p></div><div class="pt-space-xs"><a class="w-full inline-flex items-center justify-center py-2.5 px-4 rounded-lg bg-surface-container-high hover:bg-primary-container hover:text-surface-container-lowest text-primary-container border border-primary-container/30 font-headline-sm text-headline-sm font-semibold transition-all duration-200" href="#"><span class="material-symbols-outlined ml-2 text-[20px]">music_note</span>פתח טאב אינטראקטיבי</a></div></div></div>
-</div>
-</section>
-<!-- 4. HOW IT WORKS SECTION (4 Steps) -->
-<section class="space-y-space-lg py-space-md">
-<div class="text-center max-w-2xl mx-auto space-y-space-xs">
-<h2 class="font-headline-lg text-headline-lg font-bold text-on-surface">
-          איך זה עובד? <span class="text-primary-container">4 צעדים לסולו הבא שלך</span>
-</h2>
-<p class="font-body-md text-body-md text-on-surface-variant">
-          המתודולוגיה המהירה ביותר ממעבר על התווים ועד לנגינה חיה בטמפו מלא
-        </p>
-</div>
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
-<!-- Step 1 -->
-<div class="glass-panel rounded-xl p-space-md border border-outline-variant/30 flex flex-col justify-between relative overflow-hidden group hover:border-primary-container/40 transition-colors">
-<span class="font-label-lg text-label-lg font-mono text-outline/30 font-extrabold text-3xl group-hover:text-primary-container/40 transition-colors">01</span>
-<div class="mt-4">
-<span class="font-label-sm text-label-sm text-primary-container font-mono uppercase">שלב 01</span>
-<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface mt-1">הרשמה חינמית</h3>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-2 leading-relaxed">
-              יוצרים חשבון תוך דקה ובוחרים את כלי הנגינה, רמת המיומנות והסגנון המועדף עליך.
-            </p>
-</div>
-</div>
-<!-- Step 2 -->
-<div class="glass-panel rounded-xl p-space-md border border-outline-variant/30 flex flex-col justify-between relative overflow-hidden group hover:border-primary-container/40 transition-colors">
-<span class="font-label-lg text-label-lg font-mono text-outline/30 font-extrabold text-3xl group-hover:text-primary-container/40 transition-colors">02</span>
-<div class="mt-4">
-<span class="font-label-sm text-label-sm text-primary-container font-mono uppercase">שלב 02</span>
-<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface mt-1">בחירת שיר וטאב</h3>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-2 leading-relaxed">
-              מחפשים שיר לפי אמן, רמת קושי, כיוון מיתרים ייחודי או טמפו (BPM) המתאים ליעד שלך.
-            </p>
-</div>
-</div>
-<!-- Step 3 -->
-<div class="glass-panel rounded-xl p-space-md border border-outline-variant/30 flex flex-col justify-between relative overflow-hidden group hover:border-primary-container/40 transition-colors">
-<span class="font-label-lg text-label-lg font-mono text-outline/30 font-extrabold text-3xl group-hover:text-primary-container/40 transition-colors">03</span>
-<div class="mt-4">
-<span class="font-label-sm text-label-sm text-primary-container font-mono uppercase">שלב 03</span>
-<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface mt-1">אימון אינטראקטיבי</h3>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-2 leading-relaxed">
-              מתאמנים עם הנגן החכם, מאטים את הטמפו, מבודדים ערוצי אודיו ומסמנים לופים על תיבות קריטיות.
-            </p>
-</div>
-</div>
-<!-- Step 4 -->
-<div class="glass-panel rounded-xl p-space-md border border-outline-variant/30 flex flex-col justify-between relative overflow-hidden group hover:border-secondary-container/40 transition-colors">
-<span class="font-label-lg text-label-lg font-mono text-outline/30 font-extrabold text-3xl group-hover:text-secondary-container/40 transition-colors">04</span>
-<div class="mt-4">
-<span class="font-label-sm text-label-sm text-secondary-container font-mono uppercase">שלב 04</span>
-<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface mt-1">השתלטות על הריף</h3>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-2 leading-relaxed">
-              מנגנים במהירות מלאה ומקבלים ציון דיוק, שמירה על קצב וטכניקה עד להקלטת הטייק המושלם.
-            </p>
-</div>
-</div>
-</div>
-</section>
-<!-- 5. CALL TO ACTION BANNER (CTA) -->
-<section class="py-space-md">
-<div class="relative glass-panel rounded-2xl p-space-lg md:p-space-xl text-center overflow-hidden cyan-edge-glow">
-<!-- Radial Inner Backlight -->
-<div class="absolute inset-0 bg-gradient-to-b from-primary-container/10 via-transparent to-surface-container-lowest/80 pointer-events-none"></div>
-<div class="relative z-10 max-w-2xl mx-auto space-y-space-md">
-<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-container/10 border border-primary-container/40 text-primary-container font-label-sm text-label-sm mx-auto">
-<span class="material-symbols-outlined text-[16px]">bolt</span>
-            ללא כרטיס אשראי • גישה מיידית
-          </div>
-<h2 class="font-headline-xl text-headline-xl font-extrabold text-on-surface tracking-tight">
-            מוכנים לבדוק את השיר הראשון?
-          </h2>
-<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl mx-auto">
-            הצטרפו לאלפי גיטריסטים, בסיסטים ומתופפים שלומדים ומנגנים בצורה המדויקת ביותר. אין צורך בכרטיס אשראי.
-          </p>
-<div class="flex flex-col sm:flex-row items-center justify-center gap-space-md pt-space-xs">
-<a class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 rounded-lg bg-primary-container text-surface-container-lowest font-headline-sm text-headline-sm font-bold neon-cyan-glow hover:bg-primary-fixed-dim transition-all duration-200 active:scale-[0.98]" href="#">
-<span class="material-symbols-outlined ml-2" style="font-variation-settings: &quot;FILL&quot; 1;">rocket_launch</span>
-              הרשמה מהירה בחינם
-            </a>
-<a class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 rounded-lg text-on-surface font-headline-sm text-headline-sm hover:text-primary-container transition-colors duration-150" href="#">
-              או עיינו בקטלוג השירים
-              <span class="material-symbols-outlined mr-1 text-[18px]">arrow_back</span>
-</a>
-</div>
-</div>
-</div>
-</section>
+        <!-- Interactive Tab Player Widget Preview -->
+        <div class="lg:col-span-5">
+            <div class="subtle-panel-elevated rounded-2xl p-6 border border-purple-900/30 relative overflow-hidden shadow-2xl">
+                <div class="flex items-center justify-between pb-3.5 mb-3 border-b border-white/[0.06] font-mono text-[11px]">
+                    <span class="flex items-center gap-2 text-accent font-medium">
+                        <span class="w-2 h-2 rounded-full bg-accent"></span>נגן תווים וטאבים אינטראקטיבי
+                    </span>
+                    <span class="px-2 py-0.5 rounded-full bg-surface-subtle text-text-faint border border-white/[0.04]">סנכרון מלא</span>
+                </div>
+                <div class="flex items-start justify-between pb-3">
+                    <div class="space-y-1">
+                        <div class="font-mono text-[11px] text-accent font-medium tracking-wider">METALLICA</div>
+                        <div class="text-lg font-semibold text-text-primary">Master of Puppets</div>
+                        <div class="text-xs text-text-secondary">טכניקת פריטה • 212 פעימות לדקה • כיוון סטנדרטי E</div>
+                    </div>
+                    <div class="px-3 py-1.5 rounded-xl bg-surface border border-purple-900/40 text-accent font-mono text-xs flex items-center gap-1.5 shadow-inner">
+                        <span class="material-symbols-outlined text-[15px]">speed</span>
+                        <span>212 BPM</span>
+                    </div>
+                </div>
+                <div class="mt-3 p-4 rounded-xl bg-obsidian/95 border border-white/[0.06] font-mono text-xs overflow-x-hidden relative">
+                    <div class="flex items-center justify-between text-text-faint text-[10px] mb-2 font-mono">
+                        <span>תיבה 24/118</span>
+                        <span>E Standard (E B G D A E)</span>
+                    </div>
+                    <div class="space-y-1 select-none font-mono text-[11px] text-text-secondary">
+                        <div class="flex items-center gap-2"><span class="w-3 text-text-faint text-[9px]">e</span><span class="text-white/10">---------------------------------</span></div>
+                        <div class="flex items-center gap-2"><span class="w-3 text-text-faint text-[9px]">B</span><span class="text-white/10">---------------------------------</span></div>
+                        <div class="flex items-center gap-2"><span class="w-3 text-text-faint text-[9px]">G</span><span class="text-white/10">---------------------------------</span></div>
+                        <div class="flex items-center gap-2"><span class="w-3 text-text-faint text-[9px]">D</span><span class="text-white/10">---<span class="text-accent font-medium">7</span>-7---<span class="text-accent font-medium">8</span>-8---<span class="text-accent font-medium">7</span>-7--------</span></div>
+                        <div class="flex items-center gap-2"><span class="w-3 text-text-faint text-[9px]">A</span><span class="text-white/10">---<span class="text-accent font-medium">5</span>-5---<span class="text-accent font-medium">6</span>-6---<span class="text-accent font-medium">5</span>-5--------</span></div>
+                        <div class="flex items-center gap-2"><span class="w-3 text-text-faint text-[9px]">E</span><span class="text-white/10">-0-0---0-0---0-0---0-0-12\--</span></div>
+                    </div>
+                    <div class="absolute top-0 bottom-0 left-1/3 w-[1.5px] bg-accent pointer-events-none shadow-[0_0_8px_#c084fc]"></div>
+                </div>
+                <div class="mt-4 space-y-1.5">
+                    <div class="flex justify-between items-center font-mono text-xs">
+                        <span class="text-text-secondary">דיוק ביצוע ממוצע</span>
+                        <span class="text-accent font-mono text-[12px] font-semibold">94%</span>
+                    </div>
+                    <div class="w-full h-2 rounded-full bg-surface-subtle overflow-hidden">
+                        <div class="h-full bg-primary rounded-full" style="width: 94%;"></div>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center justify-between pt-3 border-t border-white/[0.06] font-mono text-xs">
+                    <div class="flex items-center gap-1.5 text-text-faint text-[11px]">
+                        <span>מהירות נגינה:</span>
+                        <span class="px-2 py-0.5 rounded-lg bg-surface text-text-secondary border border-white/[0.04]">0.75x</span>
+                        <span class="px-2 py-0.5 rounded-lg bg-primary text-white font-medium shadow-sm">1.0x</span>
+                        <span class="px-2 py-0.5 rounded-lg bg-surface text-text-secondary border border-white/[0.04]">1.25x</span>
+                    </div>
+                    <span class="font-mono text-accent text-[11px] bg-accent/10 px-2 py-0.5 rounded-md">בקרת מהירות מובנית</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Cards -->
+    <section class="space-y-8">
+        <div class="max-w-xl space-y-2">
+            <div class="font-mono text-accent text-xs tracking-wider uppercase">היתרונות המרכזיים של פלטפורמת instruMETAL</div>
+            <h2 class="text-2xl md:text-3xl font-semibold text-text-primary">שליטה טכנית ודיוק בנגינה</h2>
+            <p class="text-xs md:text-sm text-text-secondary leading-relaxed">תרגול מבוקר בקצב הדרגתי עד לשליטה מלאה ביצירה ובטכניקות הנגינה המתקדמות.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="p-6 rounded-2xl subtle-panel border border-white/[0.06] hover:border-purple-900/40 transition-all duration-200 flex flex-col justify-between space-y-5">
+                <div class="w-11 h-11 rounded-xl bg-surface-subtle flex items-center justify-center text-accent border border-purple-500/20 shadow-sm">
+                    <span class="material-symbols-outlined text-[24px]">queue_music</span>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="text-base font-semibold text-text-primary">1. טאבים ותווים אינטראקטיביים ומדויקים</h3>
+                    <p class="text-xs text-text-secondary leading-relaxed font-normal">תצוגת תווים חיה המסונכרנת במלואה להקלטת המקור, עם אפשרות לשינוי מהירות ללא שינוי בגובה הצליל.</p>
+                </div>
+                <div class="pt-3 border-t border-white/[0.04] text-[11px] font-mono text-accent flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px]">check_circle</span>דיוק פדגוגי מאומת
+                </div>
+            </div>
+            <div class="p-6 rounded-2xl subtle-panel border border-white/[0.06] hover:border-purple-900/40 transition-all duration-200 flex flex-col justify-between space-y-5">
+                <div class="w-11 h-11 rounded-xl bg-surface-subtle flex items-center justify-center text-accent border border-purple-500/20 shadow-sm">
+                    <span class="material-symbols-outlined text-[24px]">graphic_eq</span>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="text-base font-semibold text-text-primary">2. בידוד ערוצים מקצועי (Multi-Track)</h3>
+                    <p class="text-xs text-text-secondary leading-relaxed font-normal">האזנה ממוקדת לכל כלי בנפרד – גיטרה מובילה, בס או תופים. השתקת כלי הנגינה הרצוי לנגינה עצמאית עם הליווי המקורי.</p>
+                </div>
+                <div class="pt-3 border-t border-white/[0.04] text-[11px] font-mono text-accent flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px]">check_circle</span>מיקסר שמע מתקדם
+                </div>
+            </div>
+            <div class="p-6 rounded-2xl subtle-panel border border-white/[0.06] hover:border-purple-900/40 transition-all duration-200 flex flex-col justify-between space-y-5">
+                <div class="w-11 h-11 rounded-xl bg-surface-subtle flex items-center justify-center text-accent border border-purple-500/20 shadow-sm">
+                    <span class="material-symbols-outlined text-[24px]">trending_up</span>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="text-base font-semibold text-text-primary">3. תרגול מובנה ומעקב התקדמות</h3>
+                    <p class="text-xs text-text-secondary leading-relaxed font-normal">יצירת לופים לקטעים מורכבים, אימון קצב הדרגתי ומעקב מקיף אחר שיפור הביצועים ורמת הדיוק הטכני.</p>
+                </div>
+                <div class="pt-3 border-t border-white/[0.04] text-[11px] font-mono text-accent flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px]">check_circle</span>העלאת מהירות מבוקרת
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-4">
+        <div class="relative rounded-3xl p-8 md:p-12 text-center subtle-panel border border-purple-900/40 aura-pill shadow-xl">
+            <div class="max-w-xl mx-auto space-y-5">
+                <span class="inline-block px-3 py-1 rounded-full bg-purple-950/40 border border-purple-500/20 font-mono text-[11px] text-accent tracking-widest uppercase">גישה ישירה • ללא התחייבות</span>
+                <h2 class="text-2xl md:text-3xl font-semibold text-text-primary tracking-tight">הצטרפו לקהילת הנגנים והתחילו ללמוד כעת</h2>
+                <p class="text-xs md:text-sm text-text-secondary max-w-md mx-auto leading-relaxed">סביבת עבודה מקצועית ומדויקת לפיתוח מיומנויות נגינה ברמה הגבוהה ביותר. התחילו ללא עלות.</p>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2 font-mono">
+                    <a class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-xl bg-primary hover:bg-primary-deep text-white text-xs font-medium border border-purple-400/25 transition-all duration-150 shadow-lg shadow-primary/25" href="register">
+                        <span class="material-symbols-outlined ml-2 text-[16px]">play_arrow</span>התחלת למידה
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
 </main>
-<!-- SHARED COMPONENT: Footer -->
-
-
-
-</body></html>
