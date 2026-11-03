@@ -1,12 +1,10 @@
 ﻿<!DOCTYPE html>
 <html lang="he" dir="rtl" class="dark">
-
 <head>
-    <link rel="stylesheet" href="css/site.css" />
-    <link rel="stylesheet" href="app.css" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
+    <ResourcePreloader />
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="images/InstrumentalLogo.png" />
@@ -20,76 +18,50 @@
     <!-- Tailwind CSS Script & Custom Config -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              colors: {
-                obsidian: "#070709",
-                canvas: "#0a0a0f",
-                surface: "#100f14",
-                "surface-subtle": "#15131b",
-                "border-hairline": "rgba(255, 255, 255, 0.05)",
-                "border-purple": "rgba(124, 58, 237, 0.16)",
-                primary: "#7c3aed",
-                "primary-deep": "#6d28d9",
-                "primary-dark": "#4c1d95",
-                accent: "#c084fc",
-                "accent-muted": "#9d74c9",
-                "text-primary": "#f1eff5",
-                "text-secondary": "#8e899b",
-                "text-faint": "#494455"
-              },
-              borderRadius: {
-                DEFAULT: "0.25rem",
-                lg: "0.375rem",
-                xl: "0.5rem",
-                full: "9999px"
-              },
-              fontFamily: {
-                sans: ["Rubik", "sans-serif"],
-                mono: ["JetBrains Mono", "monospace"]
+            tailwind.config = {
+              darkMode: "class",
+              theme: {
+                extend: {
+                  colors: {
+                    obsidian: "#070709",
+                    canvas: "#0a0a0f",
+                    surface: "#100f14",
+                    "surface-subtle": "#15131b",
+                    "border-hairline": "rgba(255, 255, 255, 0.05)",
+                    "border-purple": "rgba(124, 58, 237, 0.16)",
+                    primary: "#7c3aed",
+                    "primary-deep": "#6d28d9",
+                    "primary-dark": "#4c1d95",
+                    accent: "#c084fc",
+                    "accent-muted": "#9d74c9",
+                    "text-primary": "#f1eff5",
+                    "text-secondary": "#8e899b",
+                    "text-faint": "#494455"
+                  },
+                  borderRadius: {
+                    DEFAULT: "0.25rem",
+                    lg: "0.375rem",
+                    xl: "0.5rem",
+                    full: "9999px"
+                  },
+                  fontFamily: {
+                    sans: ["Rubik", "sans-serif"],
+                    mono: ["JetBrains Mono", "monospace"]
+                  }
+                }
               }
             }
-          }
-        }
     </script>
 
-    <!-- Custom CSS Aura & Panel Styles -->
-    <style>
-        body {
-          background-color: #070709;
-          color: #f1eff5;
-          font-family: 'Rubik', sans-serif;
-          overflow-x: hidden;
-          letter-spacing: -0.01em;
-        }
-        .aura-purple-radial {
-          background: radial-gradient(circle at 50% 20%, rgba(109, 40, 217, 0.09) 0%, rgba(76, 29, 149, 0.03) 45%, transparent 75%);
-        }
-        .aura-pill {
-          background: radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.14) 0%, transparent 80%);
-        }
-        .subtle-panel {
-          background: rgba(16, 15, 20, 0.65);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .subtle-panel-elevated {
-          background: rgba(18, 16, 24, 0.82);
-          backdrop-filter: blur(24px);
-          -webkit-backdrop-filter: blur(24px);
-          border: 1px solid rgba(124, 58, 237, 0.12);
-        }
-    </style>
+    <!-- App Styles -->
+    <link rel="stylesheet" href="css/site.css" />
+    <link rel="stylesheet" href="app.css" />
 
     <HeadOutlet />
 </head>
-
 <body class="bg-obsidian text-text-primary antialiased min-h-screen flex flex-col relative">
     <Routes />
+    <ReconnectModal />
     <script src="_framework/blazor.web.js"></script>
 </body>
-
 </html>

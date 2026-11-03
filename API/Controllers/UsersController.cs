@@ -33,7 +33,21 @@ namespace API.Controllers
 
             return Ok(user);
         }
+        // GET: api/users/exists/shredder
+        [HttpGet("exists/{username}")]
+        public async Task<IActionResult> UsernameExists(string username)
+        {
+            bool exists = await _userDb.UsernameExistsAsync(username);
+            return Ok(exists);
+        }
 
+        // GET: api/users/email-exists/user@metal.com
+        [HttpGet("email-exists/{email}")]
+        public async Task<IActionResult> EmailExists(string email)
+        {
+            bool exists = await _userDb.EmailExistsAsync(email);
+            return Ok(exists);
+        }
         // POST: api/users
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] User user)

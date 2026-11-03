@@ -1,5 +1,16 @@
 ﻿/* ==========================================================================
-   1. Custom Utility Classes & Aura Effects
+   1. Base & Global Styles
+   ========================================================================== */
+body {
+    background-color: #070709;
+    color: #f1eff5;
+    font-family: 'Rubik', sans-serif;
+    overflow-x: hidden;
+    letter-spacing: -0.01em;
+}
+
+/* ==========================================================================
+   2. Custom Utility Classes & Aura Effects
    ========================================================================== */
 .aura-purple-radial {
     background: radial-gradient(circle at 50% 20%, rgba(109, 40, 217, 0.09) 0%, rgba(76, 29, 149, 0.03) 45%, transparent 75%);
@@ -32,7 +43,7 @@
 }
 
 /* ==========================================================================
-   2. Dark Obsidian Scrollbar
+   3. Dark Obsidian Scrollbar
    ========================================================================== */
 ::-webkit-scrollbar {
     width: 8px;
@@ -54,7 +65,7 @@
     }
 
 /* ==========================================================================
-   3. Blazor System UI Components
+   4. Blazor System UI Components
    ========================================================================== */
 #blazor-error-ui {
     background: #3b0764;
@@ -74,7 +85,140 @@
     #blazor-error-ui .dismiss {
         cursor: pointer;
         position: absolute;
-        right: 0.75rem;
+        left: 0.75rem;
         top: 0.5rem;
         color: #c084fc;
     }
+
+/* ==========================================================================
+   5. Home Page Styles & Widget Classes
+   ========================================================================== */
+.hero-ambient-glow-1 {
+    top: -10rem;
+    right: 25%;
+    width: 650px;
+    height: 650px;
+    background-color: rgba(124, 58, 237, 0.05);
+    filter: blur(160px);
+}
+
+.hero-ambient-glow-2 {
+    top: 50%;
+    left: 2.5rem;
+    width: 500px;
+    height: 500px;
+    background-color: rgba(76, 29, 149, 0.06);
+    filter: blur(180px);
+}
+
+.tab-player-cursor {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 33.333333%;
+    width: 1.5px;
+    background-color: #c084fc;
+    pointer-events: none;
+    box-shadow: 0 0 8px #c084fc;
+}
+
+.tab-progress-bar-94 {
+    width: 94%;
+}
+
+/* ==========================================================================
+   6. Login Page Styles
+   ========================================================================== */
+.login-ambient-glow-1 {
+    top: -8rem;
+    right: 25%;
+    width: 32rem;
+    height: 32rem;
+    background-color: rgba(88, 28, 135, 0.15);
+    filter: blur(150px);
+}
+
+.login-ambient-glow-2 {
+    top: 50%;
+    left: 2.5rem;
+    width: 24rem;
+    height: 24rem;
+    background-color: rgba(76, 29, 149, 0.1);
+    filter: blur(140px);
+}
+
+.login-ambient-glow-3 {
+    bottom: -6rem;
+    right: 33.333333%;
+    width: 20rem;
+    height: 20rem;
+    background-color: rgba(46, 16, 101, 0.2);
+    filter: blur(130px);
+}
+
+.login-grid-pattern {
+    background-image: radial-gradient(rgba(147, 51, 234, 0.05) 1px, transparent 1px);
+    background-size: 36px 36px;
+}
+
+.login-card {
+    background-color: rgba(18, 13, 29, 0.7);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(168, 85, 247, 0.1);
+}
+
+.logo-glow-purple {
+    filter: drop-shadow(0 0 16px rgba(168, 85, 247, 0.35));
+}
+
+/* ==========================================================================
+   7. Register Page Styles & Utilities
+   ========================================================================== */
+.register-ambient-glow-1 {
+    top: -11rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 550px;
+    background-color: rgba(88, 28, 135, 0.2);
+    filter: blur(160px);
+}
+
+.register-ambient-glow-2 {
+    bottom: -9rem;
+    left: -5rem;
+    width: 500px;
+    height: 500px;
+    background-color: rgba(76, 29, 149, 0.15);
+    filter: blur(150px);
+}
+
+.register-ambient-glow-3 {
+    bottom: -6rem;
+    right: -6rem;
+    width: 450px;
+    height: 450px;
+    background-color: rgba(46, 16, 101, 0.25);
+    filter: blur(140px);
+}
+
+.register-grid-pattern {
+    background-image: radial-gradient(rgba(168, 85, 247, 0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+}
+
+.register-card {
+    background-color: rgba(13, 10, 21, 0.9);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+}
+
+.logo-wrapper-glow {
+    box-shadow: 0 0 24px rgba(124, 58, 237, 0.25);
+}
+
+.icon-fill {
+    font-variation-settings: 'FILL' 1;
+}

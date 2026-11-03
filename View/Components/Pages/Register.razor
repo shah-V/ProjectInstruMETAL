@@ -5,27 +5,28 @@
 @inject HttpClient Http
 @inject NavigationManager Navigation
 
+
 <PageTitle>הרשמה ל-instruMETAL | הצטרפו לקהילת המטאל והרוק המתקדם</PageTitle>
 
 <!-- Atmospheric Background Ambient Lights -->
 <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-    <div class="absolute -top-44 left-1/2 -translate-x-1/2 w-[800px] h-[550px] bg-purple-900/20 rounded-full blur-[160px]"></div>
-    <div class="absolute -bottom-36 -left-20 w-[500px] h-[500px] bg-[#4c1d95]/15 rounded-full blur-[150px]"></div>
-    <div class="absolute -bottom-24 -right-24 w-[450px] h-[450px] bg-[#2e1065]/25 rounded-full blur-[140px]"></div>
-    <div class="absolute inset-0 bg-[radial-gradient(rgba(168,85,247,0.04)_1px,transparent_1px)] [background-size:32px_32px]"></div>
+    <div class="absolute rounded-full register-ambient-glow-1"></div>
+    <div class="absolute rounded-full register-ambient-glow-2"></div>
+    <div class="absolute rounded-full register-ambient-glow-3"></div>
+    <div class="absolute inset-0 register-grid-pattern"></div>
 </div>
 
 <!-- Main Registration Section -->
 <main class="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-10 md:py-16 relative z-10">
     <div class="w-full max-w-lg mx-auto">
-        <div class="relative bg-[#0d0a15]/90 backdrop-blur-2xl p-7 sm:p-9 border border-purple-500/15 shadow-[0_20px_50px_rgba(0,0,0,0.85)] purple-subtle-glow overflow-hidden rounded-3xl">
+        <div class="relative register-card p-7 sm:p-9 border border-purple-500/15 purple-subtle-glow overflow-hidden rounded-3xl">
             <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-80 h-40 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
 
             <!-- Title & Logo -->
             <div class="text-center mb-7 relative z-10">
                 <div class="inline-flex items-center justify-center mb-3">
-                    <div class="relative flex items-center justify-center p-2 rounded-2xl bg-purple-950/20 border border-purple-500/20 shadow-[0_0_24px_rgba(124,58,237,0.25)]">
-                        <img src="images/InstrumentalLogo.png" alt="instruMETAL Logo" class="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-[0_0_16px_rgba(168,85,247,0.45)]">
+                    <div class="relative flex items-center justify-center p-2 rounded-2xl bg-purple-950/20 border border-purple-500/20 logo-wrapper-glow">
+                        <img src="images/InstrumentalLogo.png" alt="instruMETAL Logo" class="w-16 h-16 sm:w-20 sm:h-20 object-contain logo-glow-purple">
                     </div>
                 </div>
                 <div class="font-headline-sm text-xs font-semibold tracking-widest uppercase text-purple-400/90 mb-1">instruMETAL</div>
@@ -92,7 +93,7 @@
                             disabled="@(isBusy || isRegistered)"
                             @onclick="RegisterAsync"
                             class="w-full py-3 px-6 bg-gradient-to-r from-purple-700 via-purple-600 to-purple-700 hover:from-purple-600 hover:via-purple-500 hover:to-purple-600 text-white font-headline-sm text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-200 tracking-wide cursor-pointer purple-button-glow border border-purple-400/25 active:scale-[0.99] rounded-xl disabled:opacity-50">
-                        <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">bolt</span>
+                        <span class="material-symbols-outlined text-[18px] icon-fill">bolt</span>
                         <span>@(isBusy ? "בודקים..." : "צור חשבון")</span>
                     </button>
                 </div>
