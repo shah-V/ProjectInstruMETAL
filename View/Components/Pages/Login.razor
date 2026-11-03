@@ -1,7 +1,8 @@
 ﻿@page "/login"
-@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@using System.Net
 @using Model
 @inject HttpClient Http
+@inject UserSession Session
 @inject NavigationManager Navigation
 
 <PageTitle>התחברות | instruMETAL</PageTitle>
@@ -148,17 +149,37 @@
 
         try
         {
-            var loginDto = new { Identifier = identifier.Trim(), Password = password };
+            // שליחת הנתונים במבנה שה-API מצפה לקבל (Username + Password)
+            var loginDto = new { Username = identifier.Trim(), Password = password };
             HttpResponseMessage response = await Http.PostAsJsonAsync("api/users/login", loginDto);
 
-            if (response.IsSuccessStatusCode)
+            // 1. בדיקת קוד שגיאה 401 Unauthorized (פרטים לא נכונים)
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
-                Navigation.NavigateTo("/");
+                errorMessage = "שם המשתמש או הסיסמה שגויים.";
+                return;
             }
-            else
+
+            // 2. בדיקת הצלחה כללית של הבקשה
+            if (!response.IsSuccessStatusCode)
             {
-                errorMessage = "שם המשתמש/האימייל או הסיסמה אינם נכונים.";
+                errorMessage = "הכניסה נכשלה. נסו שוב.";
+                return;
             }
+
+            // 3. קריאת אובייקט המשתמש שחזר מהשרת
+            User? user = await response.Content.ReadFromJsonAsync<User>();
+            if (user == null)
+            {
+                errorMessage = "הכניסה נכשלה. נסו שוב.";
+                return;
+            }
+
+            // 4. שמירת המשתמש בשירות ה-Session שמלווה את כל דפי האתר
+            Session.Login(user);
+
+            // 5. העברה לדף הבית
+            Navigation.NavigateTo("");
         }
         catch (HttpRequestException)
         {

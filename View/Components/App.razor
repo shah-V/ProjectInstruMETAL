@@ -57,11 +57,16 @@
     <link rel="stylesheet" href="css/site.css" />
     <link rel="stylesheet" href="app.css" />
 
-    <HeadOutlet />
+    <HeadOutlet @rendermode="pageRenderMode" />
 </head>
 <body class="bg-obsidian text-text-primary antialiased min-h-screen flex flex-col relative">
-    <Routes />
+    <Routes @rendermode="pageRenderMode" />
     <ReconnectModal />
     <script src="_framework/blazor.web.js"></script>
 </body>
 </html>
+
+@code {
+    private static readonly IComponentRenderMode pageRenderMode =
+        new InteractiveServerRenderMode(prerender: false);
+}

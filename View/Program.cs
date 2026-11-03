@@ -13,6 +13,8 @@ string apiBaseUrl = builder.Configuration["ApiBaseUrl"]
 // רישום HttpClient עם הכתובת הבסיסית של ה-API
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
 
+builder.Services.AddScoped<View.Services.UserSession>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
