@@ -19,7 +19,7 @@ namespace DAL
                 id: reader.GetInt32("UserID"),
                 username: reader.GetString("Username"),
                 email: reader.GetString("Email"),
-                password: reader.GetString("PasswordHash"),
+                password: reader.GetString("PasswordHash"), // מכיל עכשיו את מחרוזת הגיבוב המלאה
                 roleId: reader.GetInt32("RoleID"),
                 roleName: reader.GetString("RoleName"),
                 isActive: reader.GetBoolean("IsActive"),
@@ -72,7 +72,7 @@ namespace DAL
             return null;
         }
 
-        // 3. הוספת משתמש חדש (מחזירה את ה-ID שנוצר)
+        // 3. הוספת משתמש חדש - שמירת גיבוב סיסמה בעזרת BCrypt
         public async Task<int> AddUserAsync(User user)
         {
             using var conn = new MySqlConnection(_connectionString);
@@ -86,7 +86,10 @@ namespace DAL
             using var cmd = new MySqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@username", user.Username);
             cmd.Parameters.AddWithValue("@email", user.Email);
-            cmd.Parameters.AddWithValue("@password", user.Password);
+
+            // גיבוב הסיסמה לפני שמירתה בבסיס הנתונים
+            cmd.Parameters.AddWithValue("@password", BCrypt.Net.BCrypt.HashPassword(user.Password));
+
             cmd.Parameters.AddWithValue("@roleId", user.RoleId == 0 ? 2 : user.RoleId); // ברירת מחדל Student (2)
             cmd.Parameters.AddWithValue("@isActive", user.IsActive);
 
@@ -122,26 +125,32 @@ namespace DAL
             return count > 0;
         }
 
-        // 6. בדיקת התחברות (שם משתמש וסיסמה)
+        // 6. בדיקת התחברות - אימות בעזרת BCrypt.Verify מול הגיבוב השמור
         public async Task<User?> CheckLoginAsync(string username, string password)
         {
             using var conn = new MySqlConnection(_connectionString);
             await conn.OpenAsync();
 
+            // שולפים את המשתמש לפי שם משתמש בלבד (ואם הוא פעיל)
             string sql = @"
                 SELECT u.UserID, u.Username, u.Email, u.PasswordHash, u.RoleID, u.IsActive, u.CreatedAt, r.RoleName
                 FROM Users u
                 JOIN Roles r ON u.RoleID = r.RoleID
-                WHERE u.Username = @username AND u.PasswordHash = @password AND u.IsActive = TRUE;";
+                WHERE u.Username = @username AND u.IsActive = TRUE;";
 
             using var cmd = new MySqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@username", username);
-            cmd.Parameters.AddWithValue("@password", password);
 
             using var reader = (MySqlDataReader)await cmd.ExecuteReaderAsync();
             if (await reader.ReadAsync())
             {
-                return ReadUser(reader);
+                User user = ReadUser(reader);
+
+                // בדיקה אם הסיסמה שהוקלדה תואמת לגיבוב השמור (כולל חילוץ המלח)
+                if (BCrypt.Net.BCrypt.Verify(password, user.Password))
+                {
+                    return user;
+                }
             }
             return null;
         }
@@ -161,7 +170,7 @@ namespace DAL
             return rowsAffected > 0;
         }
 
-        // 8. עדכון סיסמה
+        // 8. עדכון סיסמה - גיבוב הסיסמה החדשה בעזרת BCrypt
         public async Task<bool> UpdatePasswordAsync(int userId, string newPassword)
         {
             using var conn = new MySqlConnection(_connectionString);
@@ -169,7 +178,9 @@ namespace DAL
 
             string sql = "UPDATE Users SET PasswordHash = @password WHERE UserID = @userId;";
             using var cmd = new MySqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@password", newPassword);
+
+            // גיבוב הסיסמה החדשה
+            cmd.Parameters.AddWithValue("@password", BCrypt.Net.BCrypt.HashPassword(newPassword));
             cmd.Parameters.AddWithValue("@userId", userId);
 
             int rowsAffected = await cmd.ExecuteNonQueryAsync();
@@ -190,7 +201,8 @@ namespace DAL
             int rowsAffected = await cmd.ExecuteNonQueryAsync();
             return rowsAffected > 0;
         }
-        // 10. מחיקת משתמש לפי ID
+
+        // 10. מחיקה קשה של משתמש לפי ID (Hard Delete)
         public async Task<bool> DeleteUserAsync(int userId)
         {
             using var conn = new MySqlConnection(_connectionString);
@@ -204,7 +216,21 @@ namespace DAL
             return rowsAffected > 0;
         }
 
-        // 11. ספירת משתמשים לפי תפקיד (GROUP BY עם JOIN)
+        // 11. מחיקה רכה של משתמש (Soft Delete) - שינוי סטטוס ל-IsActive = FALSE
+        public async Task<bool> SoftDeleteUserAsync(int userId)
+        {
+            using var conn = new MySqlConnection(_connectionString);
+            await conn.OpenAsync();
+
+            string sql = "UPDATE Users SET IsActive = FALSE WHERE UserID = @userId;";
+            using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@userId", userId);
+
+            int rowsAffected = await cmd.ExecuteNonQueryAsync();
+            return rowsAffected > 0;
+        }
+
+        // 12. ספירת משתמשים לפי תפקיד (GROUP BY עם JOIN)
         public async Task<Dictionary<string, int>> GetCountByRoleAsync()
         {
             var result = new Dictionary<string, int>();
@@ -213,10 +239,10 @@ namespace DAL
             await conn.OpenAsync();
 
             string sql = @"
-        SELECT r.RoleName, COUNT(u.UserID) AS Total
-        FROM Users u
-        JOIN Roles r ON u.RoleID = r.RoleID
-        GROUP BY r.RoleName;";
+                SELECT r.RoleName, COUNT(u.UserID) AS Total
+                FROM Users u
+                JOIN Roles r ON u.RoleID = r.RoleID
+                GROUP BY r.RoleName;";
 
             using var cmd = new MySqlCommand(sql, conn);
             using var reader = (MySqlDataReader)await cmd.ExecuteReaderAsync();

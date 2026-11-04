@@ -20,6 +20,13 @@ namespace API.Controllers
         public async Task<IActionResult> GetAll()
         {
             var users = await _userDb.GetAllUsersAsync();
+
+            // אבטחה: מניעת חשיפת הגיבובים ברשימת המשתמשים
+            foreach (var user in users)
+            {
+                user.Password = string.Empty;
+            }
+
             return Ok(users);
         }
 
@@ -31,8 +38,12 @@ namespace API.Controllers
             if (user == null)
                 return NotFound(new { message = "המשתמש לא נמצא" });
 
+            // אבטחה: מניעת חשיפת הגיבוב
+            user.Password = string.Empty;
+
             return Ok(user);
         }
+
         // GET: api/users/exists/shredder
         [HttpGet("exists/{username}")]
         public async Task<IActionResult> UsernameExists(string username)
@@ -48,7 +59,8 @@ namespace API.Controllers
             bool exists = await _userDb.EmailExistsAsync(email);
             return Ok(exists);
         }
-        // POST: api/users
+
+        // POST: api/users (הרשמה)
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] User user)
         {
@@ -61,6 +73,9 @@ namespace API.Controllers
             int newId = await _userDb.AddUserAsync(user);
             user.Id = newId;
 
+            // אבטחה: מניעת חשיפת הגיבוב באובייקט המוחזר
+            user.Password = string.Empty;
+
             return CreatedAtAction(nameof(GetById), new { id = newId }, user);
         }
 
@@ -71,6 +86,9 @@ namespace API.Controllers
             var user = await _userDb.CheckLoginAsync(request.Username, request.Password);
             if (user == null)
                 return Unauthorized(new { message = "שם משתמש או סיסמה שגויים" });
+
+            // אבטחה: מניעת חשיפת הגיבוב
+            user.Password = string.Empty;
 
             return Ok(user);
         }
@@ -108,7 +126,7 @@ namespace API.Controllers
             return Ok(new { message = "האימייל עודכן בהצלחה" });
         }
 
-        // DELETE: api/users/5
+        // DELETE: api/users/5 (Hard Delete)
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -117,6 +135,17 @@ namespace API.Controllers
                 return NotFound(new { message = "המשתמש לא נמצא" });
 
             return Ok(new { message = "המשתמש נמחק בהצלחה" });
+        }
+
+        // PATCH: api/users/5/soft-delete (Soft Delete - הפיכה ללא פעיל)
+        [HttpPatch("{id}/soft-delete")]
+        public async Task<IActionResult> SoftDelete(int id)
+        {
+            bool success = await _userDb.SoftDeleteUserAsync(id);
+            if (!success)
+                return NotFound(new { message = "המשתמש לא נמצא" });
+
+            return Ok(new { message = "המשתמש הועבר למצב לא פעיל" });
         }
 
         // GET: api/users/count-by-role

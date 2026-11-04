@@ -137,7 +137,7 @@ namespace DAL
             }
         }
 
-        // הכנסת 10 משתמשי בדיקה
+        // הכנסת משתמשי בדיקה ראשוניים עם סיסמאות מגובבות ב-BCrypt
         private static async Task SeedUsersAsync(string connectionString)
         {
             using var conn = new MySqlConnection(connectionString);
@@ -149,21 +149,38 @@ namespace DAL
 
             if (count == 0)
             {
-                string insertSql = @"
-                    INSERT INTO Users (Username, Email, PasswordHash, RoleID, IsActive) VALUES
-                    ('admin', 'admin@school.com', '123456', 4, TRUE),
-                    ('teacher1', 'teacher1@school.com', '123456', 3, TRUE),
-                    ('teacher2', 'teacher2@school.com', '123456', 3, TRUE),
-                    ('student1', 'student1@school.com', '123456', 2, TRUE),
-                    ('student2', 'student2@school.com', '123456', 2, TRUE),
-                    ('student3', 'student3@school.com', '123456', 2, TRUE),
-                    ('student4', 'student4@school.com', '123456', 2, TRUE),
-                    ('student5', 'student5@school.com', '123456', 2, TRUE),
-                    ('student6', 'student6@school.com', '123456', 2, TRUE),
-                    ('student7', 'student7@school.com', '123456', 2, TRUE);";
+                // הגדרת משתמשי הבדיקה כולל admin, teacher ו-user לפי המדריך
+                var usersToSeed = new[]
+                {
+                    // משתמשי ליבה לפי הנחיות המדריך (עם סיסמה זהה לשם המשתמש)
+                    new { Username = "admin", Email = "admin@instrumental.com", PlainPassword = "admin", RoleId = 4 },     // Admin
+                    new { Username = "teacher", Email = "teacher@instrumental.com", PlainPassword = "teacher", RoleId = 3 }, // Teacher
+                    new { Username = "user", Email = "user@instrumental.com", PlainPassword = "user", RoleId = 2 },         // Student
 
-                using var insertCmd = new MySqlCommand(insertSql, conn);
-                await insertCmd.ExecuteNonQueryAsync();
+                    // משתמשי בדיקה נוספים
+                    new { Username = "teacher1", Email = "teacher1@school.com", PlainPassword = "123456", RoleId = 3 },
+                    new { Username = "teacher2", Email = "teacher2@school.com", PlainPassword = "123456", RoleId = 3 },
+                    new { Username = "student1", Email = "student1@school.com", PlainPassword = "123456", RoleId = 2 },
+                    new { Username = "student2", Email = "student2@school.com", PlainPassword = "123456", RoleId = 2 },
+                    new { Username = "student3", Email = "student3@school.com", PlainPassword = "123456", RoleId = 2 },
+                    new { Username = "student4", Email = "student4@school.com", PlainPassword = "123456", RoleId = 2 },
+                    new { Username = "student5", Email = "student5@school.com", PlainPassword = "123456", RoleId = 2 }
+                };
+
+                string insertSql = @"
+                    INSERT INTO Users (Username, Email, PasswordHash, RoleID, IsActive)
+                    VALUES (@username, @email, @passwordHash, @roleId, TRUE);";
+
+                foreach (var u in usersToSeed)
+                {
+                    using var cmd = new MySqlCommand(insertSql, conn);
+                    cmd.Parameters.AddWithValue("@username", u.Username);
+                    cmd.Parameters.AddWithValue("@email", u.Email);
+                    // גיבוב הסיסמה באמצעות BCrypt לפני השמירה במסד הנתונים
+                    cmd.Parameters.AddWithValue("@passwordHash", BCrypt.Net.BCrypt.HashPassword(u.PlainPassword));
+                    cmd.Parameters.AddWithValue("@roleId", u.RoleId);
+                    await cmd.ExecuteNonQueryAsync();
+                }
             }
         }
     }
