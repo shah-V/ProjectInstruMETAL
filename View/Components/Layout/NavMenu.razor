@@ -22,9 +22,12 @@
         <div class="flex items-center gap-3">
             @if (Session.IsLoggedIn)
             {
-                <span class="text-purple-200 font-label-md text-xs font-medium">
-                    שלום, @Session.Username
-                </span>
+                <!-- קישור ללוח הבקרה המותאם לתפקיד -->
+                <a href="@GetDashboardUrl()" class="text-purple-200 font-label-md text-xs font-medium hover:text-white transition-colors flex items-center gap-1.5 bg-purple-950/40 border border-purple-500/20 px-3 py-1.5 rounded-lg">
+                    <span class="material-symbols-outlined text-[16px] text-purple-400">dashboard</span>
+                    <span>לוח בקרה (@Session.Username)</span>
+                </a>
+
                 <button type="button"
                         @onclick="Logout"
                         class="px-3 py-1.5 rounded-lg bg-red-950/30 border border-red-500/30 text-red-300 font-label-md text-xs hover:bg-red-900/40 hover:border-red-400/50 transition-all duration-200 cursor-pointer">
@@ -56,6 +59,14 @@
         // עדכון ה-UI של ה-NavMenu בצורה בטוחה
         InvokeAsync(StateHasChanged);
     }
+
+    private string GetDashboardUrl() => Session.RoleId switch
+    {
+        4 => "admin-dashboard",
+        3 => "teacher-dashboard",
+        2 => "student-dashboard",
+        _ => ""
+    };
 
     private void Logout()
     {

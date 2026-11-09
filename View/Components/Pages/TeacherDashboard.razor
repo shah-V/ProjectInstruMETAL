@@ -1,0 +1,42 @@
+﻿@page "/teacher-dashboard"
+@inject UserSession Session
+@inject NavigationManager Navigation
+
+<PageTitle>לוח בקרה מורה - instruMETAL</PageTitle>
+
+@if (isAuthorized)
+{
+    <div class="container mt-4">
+        <div class="card shadow-sm p-4 border-primary">
+            <h1 class="text-primary mb-3">🎸 לוח בקרה - מורה (Teacher)</h1>
+            <p class="lead">ברוך הבא לאזור היצירה. מכאן מורים מזינים טאבים, יוצרים שיעורים חדשים ומעלים שירים ללמידה.</p>
+            <hr />
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary" disabled>יצירת שיעור חדש (שלב 9)</button>
+                <button class="btn btn-outline-secondary" disabled>השיעורים שלי (שלב 9)</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool isAuthorized = false;
+
+    protected override void OnInitialized()
+    {
+        if (!Session.IsLoggedIn)
+        {
+            Navigation.NavigateTo("login");
+            return;
+        }
+
+        // בדיקה מול RoleId 3 = Teacher
+        if (Session.RoleId != 3)
+        {
+            Navigation.NavigateTo("access-denied");
+            return;
+        }
+
+        isAuthorized = true;
+    }
+}

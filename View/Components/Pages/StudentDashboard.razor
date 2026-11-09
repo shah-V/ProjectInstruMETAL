@@ -1,0 +1,42 @@
+﻿@page "/student-dashboard"
+@inject UserSession Session
+@inject NavigationManager Navigation
+
+<PageTitle>אזור אישי תלמיד - instruMETAL</PageTitle>
+
+@if (isAuthorized)
+{
+    <div class="container mt-4">
+        <div class="card shadow-sm p-4 border-success">
+            <h1 class="text-success mb-3">🎧 אזור אישי - תלמיד (Student)</h1>
+            <p class="lead">ברוך הבא לאזור הלימוד האישי. מכאן תלמידים ניגשים לקטלוג השיעורים, צופים בטאבים ומתרגלים נגינה.</p>
+            <hr />
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-success" disabled>צפייה בקטלוג השיעורים (שלב 9)</button>
+                <button class="btn btn-outline-secondary" disabled>השיעורים שלי (שלב 9)</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool isAuthorized = false;
+
+    protected override void OnInitialized()
+    {
+
+        if (!Session.IsLoggedIn)
+        {
+            Navigation.NavigateTo("login");
+            return;
+        }
+
+        if (Session.RoleId != 2) // student
+        {
+            Navigation.NavigateTo("access-denied");
+            return;
+        }
+
+        isAuthorized = true;
+    }
+}

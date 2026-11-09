@@ -19,7 +19,7 @@
 <main class="relative z-10 flex-1 flex items-center justify-center px-4 py-12 md:py-16">
     <div class="w-full max-w-md mx-auto">
         <div class="login-card p-8 sm:p-9 shadow-2xl shadow-purple-950/20 relative rounded-2xl">
-            
+
             <!-- Card Header -->
             <div class="text-center mb-8">
                 <div class="mb-4 flex items-center justify-center">
@@ -46,7 +46,7 @@
 
             <!-- Form -->
             <form class="space-y-4" @onsubmit:preventDefault>
-                
+
                 <!-- Field 1: Username / Email -->
                 <div class="space-y-1.5 text-right">
                     <label class="block font-label-md text-xs text-zinc-300 font-medium flex items-center justify-between" for="identifier">
@@ -117,7 +117,7 @@
             <!-- Registration Redirect -->
             <div class="pt-6 border-t border-purple-950/60 text-center mt-7">
                 <p class="font-body-md text-xs text-zinc-400">
-                    עדיין אין לך חשבון? 
+                    עדיין אין לך חשבון?
                     <a href="register" class="font-medium text-purple-400 hover:text-purple-300 hover:underline underline-offset-4 mr-1 transition-all">
                         הרשם עכשיו בחינם
                     </a>
@@ -178,8 +178,23 @@
             // 4. שמירת המשתמש בשירות ה-Session שמלווה את כל דפי האתר
             Session.Login(user);
 
-            // 5. העברה לדף הבית
-            Navigation.NavigateTo("");
+            // 5. הפניה לדף הראשי המתאים לפי תפקיד המשתמש (RBAC)
+            if (user.RoleId == 4) // Admin
+            {
+                Navigation.NavigateTo("admin-dashboard");
+            }
+            else if (user.RoleId == 3) // Teacher
+            {
+                Navigation.NavigateTo("teacher-dashboard");
+            }
+            else if (user.RoleId == 2) // Student / User
+            {
+                Navigation.NavigateTo("student-dashboard");
+            }
+            else
+            {
+                Navigation.NavigateTo("");
+            }
         }
         catch (HttpRequestException)
         {

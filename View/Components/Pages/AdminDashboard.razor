@@ -1,0 +1,42 @@
+﻿@page "/admin-dashboard"
+@inject UserSession Session
+@inject NavigationManager Navigation
+
+<PageTitle>לוח בקרה מנהל - instruMETAL</PageTitle>
+
+@if (isAuthorized)
+{
+    <div class="container mt-4">
+        <div class="card shadow-sm p-4 border-danger">
+            <h1 class="text-danger mb-3">👑 לוח בקרה - מנהל מערכת (Admin)</h1>
+            <p class="lead">ברוך הבא למערכת הניהול. מכאן מנהלי המערכת מנהלים משתמשים, משדרגים תפקידים וצופים בסטטיסטיקות.</p>
+            <hr />
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-danger" disabled>ניהול משתמשים (שלב 9)</button>
+                <button class="btn btn-outline-secondary" disabled>דוחות מערכת (שלב 9)</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool isAuthorized = false;
+
+    protected override void OnInitialized()
+    {
+
+        if (!Session.IsLoggedIn)
+        {
+            Navigation.NavigateTo("login");
+            return;
+        }
+
+        if (Session.RoleId != 4) // Admin
+        {
+            Navigation.NavigateTo("access-denied");
+            return;
+        }
+
+        isAuthorized = true;
+    }
+}
