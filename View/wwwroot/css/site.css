@@ -222,3 +222,41 @@ body {
 .icon-fill {
     font-variation-settings: 'FILL' 1;
 }
+
+/* ========================================================
+   מחלקות עיצוב משותפות לשימוש חוזר בכל דפי האתר (שלב 9)
+   ======================================================== */
+
+/* כרטיסייה במראה סטודיו כהה */
+.metal-card {
+    background-color: rgba(16, 15, 20, 0.75);
+    border: 1px solid rgba(124, 58, 237, 0.16);
+    border-radius: 1rem;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease-in-out;
+}
+
+    .metal-card:hover {
+        border-color: rgba(192, 132, 252, 0.35);
+        box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.15);
+    }
+
+/* כפתור ראשי סגול זרחני */
+.btn-metal-primary {
+    background-color: #7c3aed;
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 0.75rem;
+    padding: 0.625rem 1.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.15s ease-in-out;
+    cursor: pointer;
+}
+
+    .btn-metal-primary:hover {
+        background-color: #6d28d9;
+        box-shadow: 0 0 15px rgba(124, 58, 237, 0.4);
+    }

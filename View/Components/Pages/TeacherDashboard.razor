@@ -1,26 +1,136 @@
-﻿@page "/teacher-dashboard"
+﻿@* 
+   דף ראשי: לוח בקרה למורה (Teacher Dashboard)
+   תיאור: ניהול שיעורים שפורסמו, צפייה בנתוני צפייה, וטופס יצירת שיעור/טאב חדש.
+   הרשאות: מורשה למורה (RoleId 3) ומנהל (RoleId 4).
+*@
+
+@page "/teacher-dashboard"
 @inject UserSession Session
 @inject NavigationManager Navigation
 
-<PageTitle>לוח בקרה מורה - instruMETAL</PageTitle>
+<PageTitle>אזור מורה | instruMETAL</PageTitle>
 
 @if (isAuthorized)
 {
-    <div class="container mt-4">
-        <div class="card shadow-sm p-4 border-primary">
-            <h1 class="text-primary mb-3">🎸 לוח בקרה - מורה (Teacher)</h1>
-            <p class="lead">ברוך הבא לאזור היצירה. מכאן מורים מזינים טאבים, יוצרים שיעורים חדשים ומעלים שירים ללמידה.</p>
-            <hr />
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-primary" disabled>יצירת שיעור חדש (שלב 9)</button>
-                <button class="btn btn-outline-secondary" disabled>השיעורים שלי (שלב 9)</button>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 dir-rtl">
+
+        <!-- כותרת פנל מורה -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-purple-900/20 pb-6">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                    מרכז ניהול תוכן למורה 🎸
+                </h1>
+                <p class="text-xs sm:text-sm text-zinc-400 mt-1">
+                    מחובר בתור: <span class="text-purple-300 font-semibold">@Session.Username</span>
+                </p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="student-dashboard" class="px-3.5 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-zinc-300 text-xs font-semibold hover:bg-zinc-800 transition-colors">
+                    תצוגת תלמיד
+                </a>
+                <button type="button" @onclick="() => showCreateModal = true" class="btn-metal-primary text-xs">
+                    <span class="material-symbols-outlined text-lg">add_circle</span>
+                    <span>שיעור חדש</span>
+                </button>
             </div>
         </div>
+
+        <!-- מדדים למורה -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <StatCard Title="שיעורים שפורסמו" Value="8" Icon="upload_file" SubText="2 ממתינים לאישור" />
+            <StatCard Title="תלמידים רשומים לשיעוריך" Value="142" Icon="groups" SubText="+12 השבוע" />
+            <StatCard Title="סה״כ צפיות בטאבים" Value="1,850" Icon="visibility" SubText="ממוצע 4.8 כוכבים" />
+        </div>
+
+        <!-- טבלת ניהול השיעורים שלי -->
+        <section class="metal-card p-6 space-y-4 overflow-hidden">
+            <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                <span class="material-symbols-outlined text-purple-400">queue_music</span>
+                <span>השיעורים והטאבים שפורסמו על ידך</span>
+            </h2>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-right text-xs text-zinc-300">
+                    <thead class="bg-zinc-950/80 text-zinc-400 uppercase text-[11px]">
+                        <tr>
+                            <th class="p-3 rounded-r-lg">שם השיר</th>
+                            <th class="p-3">אמן</th>
+                            <th class="p-3">סגנון</th>
+                            <th class="p-3">דרגה</th>
+                            <th class="p-3">צפיות</th>
+                            <th class="p-3 rounded-l-lg text-center">פעולות עריכה</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-800/50">
+                        <tr class="hover:bg-zinc-800/30">
+                            <td class="p-3 font-semibold text-white">Master of Puppets</td>
+                            <td class="p-3">Metallica</td>
+                            <td class="p-3"><span class="px-2 py-0.5 rounded bg-purple-950 text-purple-300 text-[10px]">Thrash</span></td>
+                            <td class="p-3">מתקדם</td>
+                            <td class="p-3">640</td>
+                            <td class="p-3 text-center space-x-2 space-x-reverse">
+                                <button class="text-purple-400 hover:text-purple-300">עריכה</button>
+                                <button class="text-red-400 hover:text-red-300">מחיקה</button>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-zinc-800/30">
+                            <td class="p-3 font-semibold text-white">Tornado of Souls</td>
+                            <td class="p-3">Megadeth</td>
+                            <td class="p-3"><span class="px-2 py-0.5 rounded bg-purple-950 text-purple-300 text-[10px]">Speed</span></td>
+                            <td class="p-3">מומחה</td>
+                            <td class="p-3">910</td>
+                            <td class="p-3 text-center space-x-2 space-x-reverse">
+                                <button class="text-purple-400 hover:text-purple-300">עריכה</button>
+                                <button class="text-red-400 hover:text-red-300">מחיקה</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- דיאלוג/טופס לדוגמה: יצירת שיעור חדש -->
+        @if (showCreateModal)
+        {
+            <div class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+                <div class="metal-card max-w-lg w-full p-6 space-y-4">
+                    <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                        <h3 class="text-lg font-bold text-white">הוספת שיעור / טאב חדש למערכת</h3>
+                        <button type="button" @onclick="() => showCreateModal = false" class="text-zinc-400 hover:text-white">✕</button>
+                    </div>
+                    <form class="space-y-3 text-right" @onsubmit:preventDefault>
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">שם השיר</label>
+                            <input type="text" placeholder="למשל: Fear of the Dark" class="w-full p-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-white" />
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-zinc-400 mb-1">אמן/להקה</label>
+                                <input type="text" placeholder="Iron Maiden" class="w-full p-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-white" />
+                            </div>
+                            <div>
+                                <label class="block text-xs text-zinc-400 mb-1">BPM (קצב)</label>
+                                <input type="number" placeholder="145" class="w-full p-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-white" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">תוכן הטאב / הערות לשיעור</label>
+                            <textarea rows="3" placeholder="הכנס תווים/טאבים בפורמט טקסט..." class="w-full p-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-white font-mono"></textarea>
+                        </div>
+                        <div class="pt-3 flex justify-end gap-2">
+                            <button type="button" @onclick="() => showCreateModal = false" class="px-4 py-2 rounded-xl bg-zinc-800 text-zinc-300 text-xs">ביטול</button>
+                            <button type="button" @onclick="() => showCreateModal = false" class="btn-metal-primary text-xs">שמור ופרסם</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        }
     </div>
 }
 
 @code {
     private bool isAuthorized = false;
+    private bool showCreateModal = false;
 
     protected override void OnInitialized()
     {
@@ -30,8 +140,8 @@
             return;
         }
 
-        // בדיקה מול RoleId 3 = Teacher
-        if (Session.RoleId != 3)
+        // מורה (3) ומנהל (4) מורשים להיכנס ללוח המורה
+        if (Session.RoleId < 3)
         {
             Navigation.NavigateTo("access-denied");
             return;

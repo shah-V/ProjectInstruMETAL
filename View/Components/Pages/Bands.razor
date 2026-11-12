@@ -1,0 +1,105 @@
+﻿@* 
+   דף נוסף: להקות ואמנים (Bands)
+   תיאור: מאפשר למשתמשים לחפש ולבחור להקה כדי לצפות בכל השירים והטאבים שלה (נתוני הדגמה).
+   הרשאות: פתוח לכל המשתמשים באתר.
+*@
+
+@page "/bands"
+
+<PageTitle>להקות ואמנים | instruMETAL</PageTitle>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 dir-rtl">
+
+    <!-- כותרת וסרגל חיפוש להקה -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-purple-900/20 pb-6">
+        <div>
+            <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                להקות ואמנים 🎸
+            </h1>
+            <p class="text-xs sm:text-sm text-zinc-400 mt-1">
+                בחר להקה או חפש שם אמן כדי לראות את כל השירים הזמינים ללימוד.
+            </p>
+        </div>
+
+        <div class="w-full md:w-80 relative">
+            <input type="text"
+                   @bind="searchBand"
+                   @bind:event="oninput"
+                   placeholder="חפש להקה (למשל: Metallica)..."
+                   class="w-full px-4 py-2.5 bg-zinc-950 border border-purple-500/20 rounded-xl text-xs text-white pr-10 focus:outline-none focus:border-purple-500" />
+            <span class="material-symbols-outlined absolute right-3 top-2.5 text-zinc-500 text-[18px]">search</span>
+        </div>
+    </div>
+
+    <!-- כרטיסי להקות לבחירה -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        @foreach (var band in FilteredBands)
+        {
+            bool isSelected = selectedBand == band.Name;
+            <button type="button"
+                    @onclick="() => selectedBand = band.Name"
+                    class="metal-card p-4 text-right transition-all cursor-pointer @(isSelected ? "border-purple-500 bg-purple-950/30" : "")">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="material-symbols-outlined text-purple-400">album</span>
+                    <span class="text-[11px] text-zinc-400">@band.SongsCount שירים</span>
+                </div>
+                <h3 class="text-sm sm:text-base font-bold text-white dir-ltr text-right">@band.Name</h3>
+                <p class="text-[11px] text-purple-300/80 mt-0.5">@band.Genre</p>
+            </button>
+        }
+    </div>
+
+    <!-- רשימת השירים של הלהקה הנבחרת -->
+    <section class="space-y-4 pt-2">
+        <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+            <span class="material-symbols-outlined text-purple-400">queue_music</span>
+            <span>השירים של <span class="text-purple-300">@selectedBand</span></span>
+        </h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            @foreach (var song in MockSongs.Where(s => s.Artist == selectedBand))
+            {
+                <LessonCard Title="@song.Title"
+                            Artist="@song.Artist"
+                            TeacherName="@song.Teacher"
+                            Genre="@song.Genre"
+                            Bpm="@song.Bpm"
+                            Difficulty="@song.Difficulty"
+                            ActionLabel="פתח שיר" />
+            }
+        </div>
+    </section>
+</div>
+
+@code {
+    private string searchBand = string.Empty;
+    private string selectedBand = "Metallica";
+
+    private record BandItem(string Name, string Genre, int SongsCount);
+    private record SongItem(string Title, string Artist, string Teacher, string Genre, int Bpm, string Difficulty);
+
+    private List<BandItem> allBands = new()
+    {
+        new("Metallica", "Thrash Metal", 3),
+        new("Megadeth", "Thrash / Speed Metal", 2),
+        new("Iron Maiden", "Heavy Metal", 2),
+        new("Dream Theater", "Progressive Metal", 1)
+    };
+
+    private IEnumerable<BandItem> FilteredBands =>
+        string.IsNullOrWhiteSpace(searchBand)
+            ? allBands
+            : allBands.Where(b => b.Name.Contains(searchBand, StringComparison.OrdinalIgnoreCase));
+
+    private List<SongItem> MockSongs = new()
+    {
+        new("Master of Puppets", "Metallica", "אלכס גורדון", "Thrash Metal", 212, "מתקדם"),
+        new("Enter Sandman", "Metallica", "דניאל לוי", "Heavy Metal", 123, "מתחיל"),
+        new("One", "Metallica", "אלכס גורדון", "Thrash Metal", 108, "בינוני"),
+        new("Holy Wars... The Punishment Due", "Megadeth", "אלכס גורדון", "Thrash Metal", 160, "מתקדם"),
+        new("Tornado of Souls", "Megadeth", "אלכס גורדון", "Speed Metal", 195, "מומחה"),
+        new("The Trooper", "Iron Maiden", "דניאל לוי", "Heavy Metal", 160, "בינוני"),
+        new("Fear of the Dark", "Iron Maiden", "יוסי כהן", "Heavy Metal", 145, "בינוני"),
+        new("Pull Me Under", "Dream Theater", "אלכס גורדון", "Progressive", 102, "מומחה")
+    };
+}

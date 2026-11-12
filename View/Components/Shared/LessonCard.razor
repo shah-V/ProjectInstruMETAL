@@ -1,0 +1,54 @@
+﻿@* 
+   רכיב משותף: כרטיס שיעור / שיר
+   תיאור: מציג שיר, אמן, סגנון, BPM ומד התקדמות או כפתור נגינה.
+   מיועד ל: קטלוג השירים, לוח תלמיד ולוח מורה.
+*@
+
+<div class="metal-card p-5 flex flex-col justify-between h-full">
+    <div>
+        <div class="flex items-center justify-between mb-3 gap-2">
+            <span class="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-purple-950/80 text-purple-300 border border-purple-500/30">
+                @Genre
+            </span>
+            <span class="text-[11px] text-zinc-400 flex items-center gap-1 dir-ltr">
+                <span class="material-symbols-outlined text-[14px]">speed</span>
+                BPM @Bpm
+            </span>
+        </div>
+        
+        <h3 class="text-lg font-semibold text-white mb-1 line-clamp-1">@Title</h3>
+        <p class="text-xs text-zinc-400 mb-4">אמן: @Artist @(!string.IsNullOrEmpty(TeacherName) ? $"| מורה: {TeacherName}" : "")</p>
+
+        @if (ProgressPercent.HasValue)
+        {
+            <div class="mb-4">
+                <div class="flex items-center justify-between text-[11px] text-zinc-400 mb-1">
+                    <span>התקדמות למידה</span>
+                    <span class="text-purple-300 font-medium">@ProgressPercent%</span>
+                </div>
+                <div class="w-full bg-zinc-800 rounded-full h-1.5 overflow-hidden">
+                    <div class="bg-purple-500 h-1.5 rounded-full" style="width: @(ProgressPercent)%"></div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="flex items-center justify-between pt-3 border-t border-zinc-800/80 mt-2">
+        <span class="text-[11px] text-zinc-400">דרגה: @Difficulty</span>
+        <button type="button" class="btn-metal-primary text-xs py-1.5 px-3">
+            <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+            <span>@ActionLabel</span>
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string Artist { get; set; } = string.Empty;
+    [Parameter] public string TeacherName { get; set; } = string.Empty;
+    [Parameter] public string Genre { get; set; } = "Metal";
+    [Parameter] public int Bpm { get; set; } = 120;
+    [Parameter] public string Difficulty { get; set; } = "בינוני";
+    [Parameter] public int? ProgressPercent { get; set; }
+    [Parameter] public string ActionLabel { get; set; } = "נגן שיעור";
+}

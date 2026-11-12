@@ -1,36 +1,77 @@
-﻿@implements IDisposable
+﻿@* 
+   רכיב משותף: סרגל ניווט עליון (NavMenu)
+   תיאור: מציג קישורי ניווט (מאגר שירים, להקות, מורים), כפתורי התחברות לאורחים, ואזור אישי + גישה מהירה לפי תפקיד למשתמשים מחוברים.
+   הרשאות: דינמי לפי מצב התחברות ותפקיד (Student, Teacher, Admin).
+*@
+
+@implements IDisposable
 @inject UserSession Session
 @inject NavigationManager Navigation
 
-<header class="bg-[#09090b]/80 backdrop-blur-md border-b border-purple-900/20 sticky top-0 z-50">
-    <div class="w-full px-6 max-w-7xl mx-auto flex items-center justify-between h-16 dir-rtl">
-        <!-- Logo & Title -->
-        <a class="font-headline-md text-headline-md font-semibold tracking-tight text-white flex items-center gap-2.5 hover:opacity-90 transition-opacity" href="">
-            <img alt="instruMETAL Logo" class="w-10 h-10 object-contain opacity-95" src="images/InstrumentalLogo.png">
-            <span class="tracking-wider text-base font-semibold">instruMETAL</span>
+<header class="bg-[#09090b]/85 backdrop-blur-md border-b border-purple-900/20 sticky top-0 z-50">
+    <div class="w-full px-4 sm:px-6 max-w-7xl mx-auto flex items-center justify-between h-16 dir-rtl">
+
+        <!-- לוגו ושם האתר: אם המשתמש מחובר, לחיצה מובילה לאזור האישי ולא לדף הבית -->
+        <a class="font-headline-md text-headline-md font-semibold tracking-tight text-white flex items-center gap-2.5 hover:opacity-90 transition-opacity"
+           href="@(Session.IsLoggedIn ? "student-dashboard" : "")">
+            <img alt="instruMETAL Logo" class="w-9 h-9 sm:w-10 sm:h-10 object-contain opacity-95" src="images/InstrumentalLogo.png">
+            <span class="tracking-wider text-sm sm:text-base font-semibold">instruMETAL</span>
         </a>
 
-        <!-- Navigation Links -->
-        <nav class="hidden md:flex items-center gap-6">
-            <a class="text-zinc-400 font-label-md text-xs hover:text-purple-300 transition-colors duration-150" href="#">טאבים</a>
-            <a class="text-zinc-400 font-label-md text-xs hover:text-purple-300 transition-colors duration-150" href="#">מאגר שירים</a>
-            <a class="text-zinc-400 font-label-md text-xs hover:text-purple-300 transition-colors duration-150" href="#">מורים</a>
-            <a class="text-zinc-400 font-label-md text-xs hover:text-purple-300 transition-colors duration-150" href="#">אודות</a>
+        <!-- קישורי ניווט מרכזיים (מסך רחב) -->
+        <nav class="hidden md:flex items-center gap-7">
+            <a class="text-zinc-400 font-label-md text-xs hover:text-purple-300 transition-colors duration-150 flex items-center gap-1.5" href="songs-catalog">
+                <span class="material-symbols-outlined text-[16px] text-purple-400/70">library_music</span>
+                <span>מאגר שירים</span>
+            </a>
+            <a class="text-zinc-400 font-label-md text-xs hover:text-purple-300 transition-colors duration-150 flex items-center gap-1.5" href="bands">
+                <span class="material-symbols-outlined text-[16px] text-purple-400/70">album</span>
+                <span>להקות</span>
+            </a>
+            <a class="text-zinc-400 font-label-md text-xs hover:text-purple-300 transition-colors duration-150 flex items-center gap-1.5" href="teachers">
+                <span class="material-symbols-outlined text-[16px] text-purple-400/70">school</span>
+                <span>מורים</span>
+            </a>
         </nav>
 
-        <!-- User / Auth Buttons -->
-        <div class="flex items-center gap-3">
+        <!-- כפתורי משתמש / התחברות -->
+        <div class="flex items-center gap-1.5 sm:gap-2">
             @if (Session.IsLoggedIn)
             {
-                <!-- קישור ללוח הבקרה המותאם לתפקיד -->
-                <a href="@GetDashboardUrl()" class="text-purple-200 font-label-md text-xs font-medium hover:text-white transition-colors flex items-center gap-1.5 bg-purple-950/40 border border-purple-500/20 px-3 py-1.5 rounded-lg">
-                    <span class="material-symbols-outlined text-[16px] text-purple-400">dashboard</span>
-                    <span>לוח בקרה (@Session.Username)</span>
+                <!-- כפתור אזור אישי: מופיע לכל משתמש מחובר -->
+                <a href="student-dashboard"
+                   class="text-purple-100 font-label-md text-xs font-medium hover:text-white transition-all flex items-center gap-1.5 bg-purple-950/60 hover:bg-purple-900/60 border border-purple-500/30 px-2.5 sm:px-3 py-1.5 rounded-lg">
+                    <span class="material-symbols-outlined text-[16px] text-purple-400">person</span>
+                    <span>אזור אישי</span>
+                    <span class="hidden lg:inline text-purple-300/80">(@Session.Username)</span>
                 </a>
 
+                <!-- כפתור קטן למורים (RoleId 3 ומעלה) -->
+                @if (Session.RoleId >= 3)
+                {
+                    <a href="teacher-dashboard"
+                       title="לוח בקרה למורה"
+                       class="px-2 py-1 rounded-md bg-indigo-950/60 border border-indigo-500/30 text-indigo-200 hover:bg-indigo-900/60 hover:text-white text-[11px] font-medium transition-colors flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">music_note</span>
+                        <span>מורה</span>
+                    </a>
+                }
+
+                <!-- כפתור קטן נוסף לאדמין (RoleId 4) -->
+                @if (Session.RoleId == 4)
+                {
+                    <a href="admin-dashboard"
+                       title="ניהול מערכת"
+                       class="px-2 py-1 rounded-md bg-amber-950/50 border border-amber-500/30 text-amber-200 hover:bg-amber-900/50 hover:text-white text-[11px] font-medium transition-colors flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">shield_person</span>
+                        <span>ניהול</span>
+                    </a>
+                }
+
+                <!-- כפתור התנתקות -->
                 <button type="button"
                         @onclick="Logout"
-                        class="px-3 py-1.5 rounded-lg bg-red-950/30 border border-red-500/30 text-red-300 font-label-md text-xs hover:bg-red-900/40 hover:border-red-400/50 transition-all duration-200 cursor-pointer">
+                        class="px-2.5 py-1.5 rounded-lg bg-red-950/30 border border-red-500/30 text-red-300 font-label-md text-xs hover:bg-red-900/40 hover:border-red-400/50 transition-all duration-200 cursor-pointer mr-1">
                     יציאה
                 </button>
             }
@@ -45,6 +86,22 @@
             }
         </div>
     </div>
+
+    <!-- תפריט משנה מותאם למובייל (מסך צר) -->
+    <nav class="flex md:hidden items-center justify-around border-t border-purple-900/20 bg-zinc-950/90 py-2 px-4 dir-rtl text-xs text-zinc-300">
+        <a href="songs-catalog" class="hover:text-purple-300 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[15px] text-purple-400">library_music</span>
+            <span>מאגר שירים</span>
+        </a>
+        <a href="bands" class="hover:text-purple-300 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[15px] text-purple-400">album</span>
+            <span>להקות</span>
+        </a>
+        <a href="teachers" class="hover:text-purple-300 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[15px] text-purple-400">school</span>
+            <span>מורים</span>
+        </a>
+    </nav>
 </header>
 
 @code {
@@ -59,14 +116,6 @@
         // עדכון ה-UI של ה-NavMenu בצורה בטוחה
         InvokeAsync(StateHasChanged);
     }
-
-    private string GetDashboardUrl() => Session.RoleId switch
-    {
-        4 => "admin-dashboard",
-        3 => "teacher-dashboard",
-        2 => "student-dashboard",
-        _ => ""
-    };
 
     private void Logout()
     {

@@ -1,20 +1,113 @@
-﻿@page "/student-dashboard"
+﻿@* 
+   דף ראשי: לוח בקרה לתלמיד (Student Dashboard)
+   תיאור: מציג את תמונת המצב של התלמיד, שירים באימון פעיל, שירים שנצפו לאחרונה ושירים שהושלמו.
+   הרשאות: מורשה לתלמיד (RoleId 2), מורה (RoleId 3) ומנהל (RoleId 4).
+*@
+
+@page "/student-dashboard"
 @inject UserSession Session
 @inject NavigationManager Navigation
 
-<PageTitle>אזור אישי תלמיד - instruMETAL</PageTitle>
+<PageTitle>אזור אישי - תלמיד | instruMETAL</PageTitle>
 
 @if (isAuthorized)
 {
-    <div class="container mt-4">
-        <div class="card shadow-sm p-4 border-success">
-            <h1 class="text-success mb-3">🎧 אזור אישי - תלמיד (Student)</h1>
-            <p class="lead">ברוך הבא לאזור הלימוד האישי. מכאן תלמידים ניגשים לקטלוג השיעורים, צופים בטאבים ומתרגלים נגינה.</p>
-            <hr />
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-success" disabled>צפייה בקטלוג השיעורים (שלב 9)</button>
-                <button class="btn btn-outline-secondary" disabled>השיעורים שלי (שלב 9)</button>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 dir-rtl">
+
+        <!-- כותרת ראשית -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-purple-900/20 pb-6">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                    שלום, @Session.Username 🤘
+                </h1>
+                <p class="text-xs sm:text-sm text-zinc-400 mt-1">
+                    מוכן למקצה האימון של היום? הנה תמונת המצב של הטאבים שלך.
+                </p>
             </div>
+            <a href="songs-catalog" class="btn-metal-primary text-xs self-start md:self-auto">
+                <span class="material-symbols-outlined text-lg">library_music</span>
+                <span>למאגר השירים המלא</span>
+            </a>
+        </div>
+
+        <!-- מדדים מספריים (StatCards) -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <StatCard Title="שירים בלמידה" Value="4" Icon="auto_stories" SubText="2 עודכנו השבוע" />
+            <StatCard Title="שירים שהושלמו" Value="12" Icon="task_alt" SubText="קצב מעולה!" />
+            <StatCard Title="שעות אימון" Value="8.5 שעות" Icon="timer" SubText="בשבעת הימים האחרונים" />
+        </div>
+
+        <!-- אזור 1: בלהט האימון (In Progress) -->
+        <section class="space-y-4">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-purple-400">local_fire_department</span>
+                    <span>בלהט האימון (פעיל כעת)</span>
+                </h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <LessonCard Title="Master of Puppets" Artist="Metallica" TeacherName="אלכס גורדון" Genre="Thrash Metal" Bpm="212" Difficulty="מתקדם" ProgressPercent="65" ActionLabel="המשך אימון" />
+                <LessonCard Title="Holy Wars... The Punishment Due" Artist="Megadeth" TeacherName="דניאל לוי" Genre="Thrash Metal" Bpm="160" Difficulty="מתקדם" ProgressPercent="40" ActionLabel="המשך אימון" />
+                <LessonCard Title="Tornado of Souls" Artist="Megadeth" TeacherName="אלכס גורדון" Genre="Speed Metal" Bpm="195" Difficulty="מומחה" ProgressPercent="85" ActionLabel="המשך אימון" />
+            </div>
+        </section>
+
+        <!-- אזור 2: נצפו לאחרונה ושירים שהושלמו (גריד כפול) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-4">
+
+            <!-- נצפו לאחרונה -->
+            <section class="metal-card p-6 space-y-4">
+                <h3 class="text-base font-semibold text-white flex items-center gap-2 border-b border-zinc-800 pb-3">
+                    <span class="material-symbols-outlined text-purple-400">history</span>
+                    <span>נצפו לאחרונה</span>
+                </h3>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/60">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-purple-400">music_note</span>
+                            <div>
+                                <p class="text-xs font-semibold text-white">Crazy Train</p>
+                                <p class="text-[11px] text-zinc-400">Ozzy Osbourne</p>
+                            </div>
+                        </div>
+                        <span class="text-[11px] text-zinc-500">לפני שעתיים</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/60">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-purple-400">music_note</span>
+                            <div>
+                                <p class="text-xs font-semibold text-white">The Trooper</p>
+                                <p class="text-[11px] text-zinc-400">Iron Maiden</p>
+                            </div>
+                        </div>
+                        <span class="text-[11px] text-zinc-500">אתמול</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- שירים שהושלמו -->
+            <section class="metal-card p-6 space-y-4">
+                <h3 class="text-base font-semibold text-white flex items-center gap-2 border-b border-zinc-800 pb-3">
+                    <span class="material-symbols-outlined text-green-400">verified</span>
+                    <span>שירים שהושלמו בהצלחה</span>
+                </h3>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/60">
+                        <div>
+                            <p class="text-xs font-semibold text-white">Paranoid</p>
+                            <p class="text-[11px] text-zinc-400">Black Sabbath</p>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-full text-[10px] bg-green-950/60 text-green-300 border border-green-500/30">100% הושלם</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/60">
+                        <div>
+                            <p class="text-xs font-semibold text-white">Breaking the Law</p>
+                            <p class="text-[11px] text-zinc-400">Judas Priest</p>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-full text-[10px] bg-green-950/60 text-green-300 border border-green-500/30">100% הושלם</span>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 }
@@ -24,14 +117,14 @@
 
     protected override void OnInitialized()
     {
-
         if (!Session.IsLoggedIn)
         {
             Navigation.NavigateTo("login");
             return;
         }
 
-        if (Session.RoleId != 2) // student
+        // תלמיד (2), מורה (3) ומנהל (4) מורשים לצפות בדף התלמיד
+        if (Session.RoleId < 2)
         {
             Navigation.NavigateTo("access-denied");
             return;

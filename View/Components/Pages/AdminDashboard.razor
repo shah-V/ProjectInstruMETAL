@@ -1,21 +1,96 @@
-﻿@page "/admin-dashboard"
+﻿@* 
+   דף ראשי: לוח בקרת מנהל (Admin Dashboard)
+   תיאור: תמונת מצב גלובלית של האפליקציה, ניהול משתמשים (שדרוג תפקידים, הקפאה).
+   הרשאות: מורשה למנהל בלבד (RoleId 4).
+*@
+
+@page "/admin-dashboard"
 @inject UserSession Session
 @inject NavigationManager Navigation
 
-<PageTitle>לוח בקרה מנהל - instruMETAL</PageTitle>
+<PageTitle>ניהול מערכת | instruMETAL</PageTitle>
 
 @if (isAuthorized)
 {
-    <div class="container mt-4">
-        <div class="card shadow-sm p-4 border-danger">
-            <h1 class="text-danger mb-3">👑 לוח בקרה - מנהל מערכת (Admin)</h1>
-            <p class="lead">ברוך הבא למערכת הניהול. מכאן מנהלי המערכת מנהלים משתמשים, משדרגים תפקידים וצופים בסטטיסטיקות.</p>
-            <hr />
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-danger" disabled>ניהול משתמשים (שלב 9)</button>
-                <button class="btn btn-outline-secondary" disabled>דוחות מערכת (שלב 9)</button>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 dir-rtl">
+
+        <!-- כותרת פנל אדמין -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-purple-900/20 pb-6">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                    לוח בקרת מנהל מערכת (Admin) 🛡️
+                </h1>
+                <p class="text-xs sm:text-sm text-zinc-400 mt-1">
+                    ניהול משתמשים, הרשאות RBAC ותמונת מצב כללית.
+                </p>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="teacher-dashboard" class="px-3 py-1.5 rounded-xl bg-purple-950/60 border border-purple-500/30 text-purple-200 text-xs hover:bg-purple-900/50">
+                    תצוגת מורה
+                </a>
+                <a href="student-dashboard" class="px-3 py-1.5 rounded-xl bg-purple-950/60 border border-purple-500/30 text-purple-200 text-xs hover:bg-purple-900/50">
+                    תצוגת תלמיד
+                </a>
             </div>
         </div>
+
+        <!-- מדדי מערכת -->
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <StatCard Title="סה״כ משתמשים" Value="1,240" Icon="person" SubText="95% תלמידים" />
+            <StatCard Title="מורים פעילים" Value="18" Icon="school" SubText="RoleId = 3" />
+            <StatCard Title="שיעורים במערכת" Value="156" Icon="library_music" SubText="מאגר תוכן" />
+            <StatCard Title="סטטוס שרת" Value="תקין (99.9%)" Icon="dns" SubText="API & Database" />
+        </div>
+
+        <!-- טבלת ניהול משתמשים -->
+        <section class="metal-card p-6 space-y-4 overflow-hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-purple-400">admin_panel_settings</span>
+                    <span>ניהול משתמשים והרשאות</span>
+                </h2>
+                <input type="text" placeholder="חפש משתמש..." class="px-3 py-1.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-white max-w-xs" />
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-right text-xs text-zinc-300">
+                    <thead class="bg-zinc-950/80 text-zinc-400 uppercase text-[11px]">
+                        <tr>
+                            <th class="p-3 rounded-r-lg">מזהה</th>
+                            <th class="p-3">שם משתמש</th>
+                            <th class="p-3">אימייל</th>
+                            <th class="p-3">תפקיד</th>
+                            <th class="p-3">סטטוס</th>
+                            <th class="p-3 rounded-l-lg text-center">פעולות ניהול</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-800/50">
+                        <tr class="hover:bg-zinc-800/30">
+                            <td class="p-3">#101</td>
+                            <td class="p-3 font-semibold text-white">shredder99</td>
+                            <td class="p-3">shred@metal.com</td>
+                            <td class="p-3"><span class="px-2 py-0.5 rounded bg-blue-950 text-blue-300 text-[10px]">Student</span></td>
+                            <td class="p-3"><span class="text-green-400">פעיל</span></td>
+                            <td class="p-3 text-center space-x-2 space-x-reverse">
+                                <button class="px-2 py-1 rounded bg-purple-950 text-purple-300 border border-purple-500/30 hover:bg-purple-900">שדרג למורה</button>
+                                <button class="text-red-400 hover:text-red-300">הקפא</button>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-zinc-800/30">
+                            <td class="p-3">#102</td>
+                            <td class="p-3 font-semibold text-white">alex_guitars</td>
+                            <td class="p-3">alex@studio.com</td>
+                            <td class="p-3"><span class="px-2 py-0.5 rounded bg-purple-950 text-purple-300 text-[10px]">Teacher</span></td>
+                            <td class="p-3"><span class="text-green-400">פעיל</span></td>
+                            <td class="p-3 text-center space-x-2 space-x-reverse">
+                                <button class="text-zinc-500 cursor-not-allowed" disabled>מורה מורשה</button>
+                                <button class="text-red-400 hover:text-red-300">הקפא</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </div>
 }
 
@@ -24,14 +99,14 @@
 
     protected override void OnInitialized()
     {
-
         if (!Session.IsLoggedIn)
         {
             Navigation.NavigateTo("login");
             return;
         }
 
-        if (Session.RoleId != 4) // Admin
+        // מנהל (4) בלבד
+        if (Session.RoleId != 4)
         {
             Navigation.NavigateTo("access-denied");
             return;
