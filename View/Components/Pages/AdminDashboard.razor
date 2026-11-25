@@ -1,12 +1,14 @@
 ﻿@* 
    דף ראשי: לוח בקרת מנהל (Admin Dashboard)
-   תיאור: תמונת מצב גלובלית של האפליקציה, ניהול משתמשים (שדרוג תפקידים, הקפאה).
+   תיאור: מציג נתונים אמיתיים מבסיס הנתונים דרך ה-API, ניהול משתמשים, שדרוג תפקידים והקפאה.
    הרשאות: מורשה למנהל בלבד (RoleId 4).
 *@
 
 @page "/admin-dashboard"
-@inject UserSession Session
-@inject NavigationManager Navigation
+@using Model
+@inject HttpClient Http // מזריק את רכיב התקשורת מול שרת ה-API
+@inject UserSession Session // מזריק את מצב ההתחברות הנוכחי
+@inject NavigationManager Navigation // מזריק את מנגנון הניווט בין דפים
 
 <PageTitle>ניהול מערכת | instruMETAL</PageTitle>
 
@@ -21,7 +23,7 @@
                     לוח בקרת מנהל מערכת (Admin) 🛡️
                 </h1>
                 <p class="text-xs sm:text-sm text-zinc-400 mt-1">
-                    ניהול משתמשים, הרשאות RBAC ותמונת מצב כללית.
+                    ניהול משתמשים, הרשאות RBAC ותמונת מצב אמיתית מבסיס הנתונים.
                 </p>
             </div>
             <div class="flex items-center gap-2">
@@ -34,84 +36,208 @@
             </div>
         </div>
 
-        <!-- מדדי מערכת -->
+        <!-- הודעת מערכת (הצלחה או שגיאה בפעולות הניהול) -->
+        @if (!string.IsNullOrEmpty(statusMessage))
+        {
+            <div class="p-3 rounded-xl bg-purple-950/50 border border-purple-500/40 text-purple-200 text-xs flex items-center justify-between">
+                <span>@statusMessage</span>
+                <button type="button" @onclick="() => statusMessage = null" class="text-zinc-400 hover:text-white">✕</button>
+            </div>
+        }
+
+        <!-- מדדי מערכת מחושבים בזמן אמת מתוך הרשימה שנשלפה מהשרת -->
         <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-            <StatCard Title="סה״כ משתמשים" Value="1,240" Icon="person" SubText="95% תלמידים" />
-            <StatCard Title="מורים פעילים" Value="18" Icon="school" SubText="RoleId = 3" />
-            <StatCard Title="שיעורים במערכת" Value="156" Icon="library_music" SubText="מאגר תוכן" />
-            <StatCard Title="סטטוס שרת" Value="תקין (99.9%)" Icon="dns" SubText="API & Database" />
+            <StatCard Title="סה״כ משתמשים" Value="@users.Count.ToString()" Icon="person" SubText="רשומים בבסיס הנתונים" />
+            <StatCard Title="מורים פעילים" Value="@users.Count(u => u.RoleId == 3 && u.IsActive).ToString()" Icon="school" SubText="בעלי הרשאת מורה" />
+            <StatCard Title="משתמשים פעילים" Value="@users.Count(u => u.IsActive).ToString()" Icon="verified_user" SubText="חשבונות פתוחים" />
+            <StatCard Title="סטטוס שרת" Value="@(isLoading ? "טוען..." : "מחובר")" Icon="dns" SubText="API & Database" />
         </div>
 
-        <!-- טבלת ניהול משתמשים -->
+        <!-- טבלת ניהול משתמשים אמיתית -->
         <section class="metal-card p-6 space-y-4 overflow-hidden">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <h2 class="text-lg font-semibold text-white flex items-center gap-2">
                     <span class="material-symbols-outlined text-purple-400">admin_panel_settings</span>
-                    <span>ניהול משתמשים והרשאות</span>
+                    <span>ניהול משתמשים והרשאות (@FilteredUsers.Count())</span>
                 </h2>
-                <input type="text" placeholder="חפש משתמש..." class="px-3 py-1.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-white max-w-xs" />
+                <!-- תיבת חיפוש שמסננת את הטבלה בזמן הקלדה -->
+                <input type="text"
+                       @bind="searchQuery"
+                       @bind:event="oninput"
+                       placeholder="חפש לפי שם משתמש או אימייל..."
+                       class="px-3 py-1.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-white max-w-xs focus:outline-none focus:border-purple-500" />
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-right text-xs text-zinc-300">
-                    <thead class="bg-zinc-950/80 text-zinc-400 uppercase text-[11px]">
-                        <tr>
-                            <th class="p-3 rounded-r-lg">מזהה</th>
-                            <th class="p-3">שם משתמש</th>
-                            <th class="p-3">אימייל</th>
-                            <th class="p-3">תפקיד</th>
-                            <th class="p-3">סטטוס</th>
-                            <th class="p-3 rounded-l-lg text-center">פעולות ניהול</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-zinc-800/50">
-                        <tr class="hover:bg-zinc-800/30">
-                            <td class="p-3">#101</td>
-                            <td class="p-3 font-semibold text-white">shredder99</td>
-                            <td class="p-3">shred@metal.com</td>
-                            <td class="p-3"><span class="px-2 py-0.5 rounded bg-blue-950 text-blue-300 text-[10px]">Student</span></td>
-                            <td class="p-3"><span class="text-green-400">פעיל</span></td>
-                            <td class="p-3 text-center space-x-2 space-x-reverse">
-                                <button class="px-2 py-1 rounded bg-purple-950 text-purple-300 border border-purple-500/30 hover:bg-purple-900">שדרג למורה</button>
-                                <button class="text-red-400 hover:text-red-300">הקפא</button>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-zinc-800/30">
-                            <td class="p-3">#102</td>
-                            <td class="p-3 font-semibold text-white">alex_guitars</td>
-                            <td class="p-3">alex@studio.com</td>
-                            <td class="p-3"><span class="px-2 py-0.5 rounded bg-purple-950 text-purple-300 text-[10px]">Teacher</span></td>
-                            <td class="p-3"><span class="text-green-400">פעיל</span></td>
-                            <td class="p-3 text-center space-x-2 space-x-reverse">
-                                <button class="text-zinc-500 cursor-not-allowed" disabled>מורה מורשה</button>
-                                <button class="text-red-400 hover:text-red-300">הקפא</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            @if (isLoading)
+            {
+                <p class="text-xs text-zinc-400 py-6 text-center">טוען נתוני משתמשים מהשרת...</p>
+            }
+            else if (!FilteredUsers.Any())
+            {
+                <p class="text-xs text-zinc-400 py-6 text-center">לא נמצאו משתמשים התואמים לחיפוש.</p>
+            }
+            else
+            {
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-xs text-zinc-300">
+                        <thead class="bg-zinc-950/80 text-zinc-400 uppercase text-[11px]">
+                            <tr>
+                                <th class="p-3 rounded-r-lg">מזהה</th>
+                                <th class="p-3">שם משתמש</th>
+                                <th class="p-3">אימייל</th>
+                                <th class="p-3">תפקיד</th>
+                                <th class="p-3">סטטוס</th>
+                                <th class="p-3 rounded-l-lg text-center">פעולות ניהול</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-800/50">
+                            @foreach (var user in FilteredUsers) // לולאה שעוברת על כל משתמש שנשלף מה-DB
+                            {
+                                <tr class="hover:bg-zinc-800/30 transition-colors">
+                                    <td class="p-3 font-mono text-zinc-400">#@user.Id</td>
+                                    <td class="p-3 font-semibold text-white">@user.Username</td>
+                                    <td class="p-3 text-zinc-400" dir="ltr">@user.Email</td>
+                                    <td class="p-3">
+                                        @if (user.RoleId == 4)
+                                        {
+                                            <span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 text-[10px]">Admin</span>
+                                        }
+                                        else if (user.RoleId == 3)
+                                        {
+                                            <span class="px-2 py-0.5 rounded bg-purple-950 text-purple-300 text-[10px]">Teacher</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="px-2 py-0.5 rounded bg-blue-950 text-blue-300 text-[10px]">Student</span>
+                                        }
+                                    </td>
+                                    <td class="p-3">
+                                        @if (user.IsActive)
+                                        {
+                                            <span class="text-green-400">פעיל</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-red-400">מוקפא</span>
+                                        }
+                                    </td>
+                                    <td class="p-3 text-center space-x-2 space-x-reverse">
+                                        @if (user.RoleId == 2 && user.IsActive) // מאפשר שדרוג רק לתלמיד פעיל
+                                        {
+                                            <button type="button"
+                                                    @onclick="() => PromoteToTeacherAsync(user)"
+                                                    class="px-2.5 py-1 rounded bg-purple-950 text-purple-300 border border-purple-500/30 hover:bg-purple-900 cursor-pointer">
+                                                שדרג למורה
+                                            </button>
+                                        }
+                                        else if (user.RoleId == 3)
+                                        {
+                                            <span class="text-zinc-500 text-[11px]">מורה מורשה</span>
+                                        }
+
+                                        @if (user.IsActive && user.RoleId != 4) // מונע הקפאה עצמית של אדמין
+                                        {
+                                            <button type="button"
+                                                    @onclick="() => FreezeUserAsync(user)"
+                                                    class="text-red-400 hover:text-red-300 cursor-pointer mr-2">
+                                                הקפא
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
         </section>
     </div>
 }
 
 @code {
-    private bool isAuthorized = false;
+    private bool isAuthorized = false; // האם למשתמש יש הרשאת מנהל
+    private bool isLoading = true; // האם הנתונים עדיין נטענים מהשרת
+    private List<User> users = new(); // רשימת המשתמשים האמיתית שמתקבלת מה-API
+    private string searchQuery = string.Empty; // טקסט החיפוש בטבלה
+    private string? statusMessage; // הודעת משוב לאחר פעולת ניהול
 
-    protected override void OnInitialized()
+    // מאפיין מחושב שמחזיר את רשימת המשתמשים המסוננת לפי תיבת החיפוש
+    private IEnumerable<User> FilteredUsers =>
+        string.IsNullOrWhiteSpace(searchQuery)
+            ? users
+            : users.Where(u => u.Username.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                               u.Email.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+
+    // רץ אוטומטית כשהדף נטען
+    protected override async Task OnInitializedAsync()
     {
-        if (!Session.IsLoggedIn)
+        if (!Session.IsLoggedIn) // בדיקה אם המשתמש בכלל מחובר
         {
             Navigation.NavigateTo("login");
             return;
         }
 
-        // מנהל (4) בלבד
-        if (Session.RoleId != 4)
+        if (Session.RoleId != 4) // בדיקה שמדובר במנהל מערכת בלבד
         {
             Navigation.NavigateTo("access-denied");
             return;
         }
 
         isAuthorized = true;
+        await LoadUsersAsync(); // קריאה לטעינת המשתמשים האמיתיים מהשרת
+    }
+
+    // פונקציה השולפת את כל המשתמשים מ-UsersController
+    private async Task LoadUsersAsync()
+    {
+        isLoading = true;
+        try
+        {
+            var result = await Http.GetFromJsonAsync<List<User>>("api/users"); // בקשת GET לכתובת api/users
+            if (result != null)
+            {
+                users = result;
+            }
+        }
+        catch (Exception)
+        {
+            statusMessage = "שגיאה בטעינת המשתמשים מהשרת. ודא שפרויקט ה-API פועל.";
+        }
+        finally
+        {
+            isLoading = false; // סיום מצב טעינה בכל מקרה
+        }
+    }
+
+    // פונקציה לשדרוג תלמיד לתפקיד מורה (RoleId = 3)
+    private async Task PromoteToTeacherAsync(User user)
+    {
+        // שליחת בקשת PATCH לעדכון תפקיד המשתמש בבסיס הנתונים
+        var response = await Http.PatchAsync($"api/users/{user.Id}/role?newRoleId=3", null);
+        if (response.IsSuccessStatusCode)
+        {
+            user.RoleId = 3; // עדכון מידי של התצוגה בטבלה ללא צורך ברענון הדף
+            statusMessage = $"המשתמש {user.Username} שודרג לתפקיד מורה בהצלחה!";
+        }
+        else
+        {
+            statusMessage = "עדכון התפקיד נכשל.";
+        }
+    }
+
+    // פונקציה להקפאת משתמש (Soft Delete)
+    private async Task FreezeUserAsync(User user)
+    {
+        // שליחת בקשת PATCH לסימון המשתמש כלא פעיל (IsActive = false)
+        var response = await Http.PatchAsync($"api/users/{user.Id}/soft-delete", null);
+        if (response.IsSuccessStatusCode)
+        {
+            user.IsActive = false; // עדכון הסטטוס בטבלה בזמן אמת
+            statusMessage = $"החשבון של {user.Username} הוקפא.";
+        }
+        else
+        {
+            statusMessage = "הקפאת המשתמש נכשלה.";
+        }
     }
 }

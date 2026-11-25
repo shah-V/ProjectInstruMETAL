@@ -65,10 +65,16 @@ namespace API.Controllers
         public async Task<IActionResult> Create([FromBody] User user)
         {
             if (await _userDb.UsernameExistsAsync(user.Username))
+            {
+                Console.WriteLine($"[Register] Failed, username taken: {user.Username}");
                 return BadRequest(new { message = "שם המשתמש כבר תפוס" });
+            }
 
             if (await _userDb.EmailExistsAsync(user.Email))
+            {
+                Console.WriteLine($"[Register] Failed, email taken: {user.Email}");
                 return BadRequest(new { message = "כתובת האימייל כבר קיימת במערכת" });
+            }
 
             int newId = await _userDb.AddUserAsync(user);
             user.Id = newId;

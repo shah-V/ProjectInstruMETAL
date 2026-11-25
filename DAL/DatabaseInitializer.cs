@@ -4,6 +4,8 @@ namespace DAL
 {
     public static class DatabaseInitializer
     {
+        private const string DatabaseName = "instruMETALDB";
+
         // מתודה ראשית להרצת כל שלבי האתחול
         public static async Task InitializeAsync(string connectionString, string serverConnectionString)
         {
@@ -13,23 +15,43 @@ namespace DAL
             // 2. הבטחה שמחרוזת החיבור לשלבים הבאים תכיל את instruMETALDB
             string dbConnectionString = connectionString.Contains("Database=", StringComparison.OrdinalIgnoreCase)
                 ? connectionString
-                : connectionString.TrimEnd(';') + ";Database=instruMETALDB;";
+                : connectionString.TrimEnd(';') + $";Database={DatabaseName};";
 
             // 3. הרצת יצירת הטבלאות והזנת נתוני הבדיקה בתוך instruMETALDB
             await CreateTablesAsync(dbConnectionString);
             await SeedRolesAsync(dbConnectionString);
             await SeedUsersAsync(dbConnectionString);
+
+            // הודעה על סיום כל שלבי האתחול בהצלחה
+            Console.WriteLine("[DB] Initialization finished, the server is ready for requests");
         }
 
         // יצירת בסיס הנתונים instruMETALDB במידה ואינו קיים בשרת
         private static async Task CreateDatabaseAsync(string serverConnectionString)
         {
             using var conn = new MySqlConnection(serverConnectionString);
+            Console.WriteLine("[DB] Connecting to the MySQL server...");
             await conn.OpenAsync();
+            Console.WriteLine("[DB] Connected to the server");
 
-            string sql = "CREATE DATABASE IF NOT EXISTS instruMETALDB;";
+            // בדיקה מול טבלת המערכת של MySQL האם בסיס הנתונים כבר קיים
+            string existsSql = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = @Name;";
+            using var existsCmd = new MySqlCommand(existsSql, conn);
+            existsCmd.Parameters.AddWithValue("@Name", DatabaseName);
+            long existing = Convert.ToInt64(await existsCmd.ExecuteScalarAsync());
+
+            string sql = $"CREATE DATABASE IF NOT EXISTS {DatabaseName};";
             using var cmd = new MySqlCommand(sql, conn);
             await cmd.ExecuteNonQueryAsync();
+
+            if (existing > 0)
+            {
+                Console.WriteLine($"[DB] Database {DatabaseName} already exists");
+            }
+            else
+            {
+                Console.WriteLine($"[DB] Created new database: {DatabaseName}");
+            }
         }
 
         // יצירת 7 הטבלאות של המערכת לפי סדר התלויות (מפתח זר)
@@ -117,6 +139,8 @@ namespace DAL
                 using var cmd = new MySqlCommand(query, conn);
                 await cmd.ExecuteNonQueryAsync();
             }
+
+            Console.WriteLine("[DB] All seven tables are ready");
         }
 
         // הכנסת תפקידי ברירת מחדל
@@ -127,13 +151,19 @@ namespace DAL
 
             string checkSql = "SELECT COUNT(*) FROM Roles;";
             using var checkCmd = new MySqlCommand(checkSql, conn);
-            long count = (long)await checkCmd.ExecuteScalarAsync();
+            long count = Convert.ToInt64(await checkCmd.ExecuteScalarAsync());
 
             if (count == 0)
             {
                 string insertSql = "INSERT INTO Roles (RoleName) VALUES ('Guest'), ('Student'), ('Teacher'), ('Admin');";
                 using var insertCmd = new MySqlCommand(insertSql, conn);
                 await insertCmd.ExecuteNonQueryAsync();
+
+                Console.WriteLine("[DB] Added the roles: Guest, Student, Teacher, Admin");
+            }
+            else
+            {
+                Console.WriteLine("[DB] Roles table already filled");
             }
         }
 
@@ -145,7 +175,7 @@ namespace DAL
 
             string checkSql = "SELECT COUNT(*) FROM Users;";
             using var checkCmd = new MySqlCommand(checkSql, conn);
-            long count = (long)await checkCmd.ExecuteScalarAsync();
+            long count = Convert.ToInt64(await checkCmd.ExecuteScalarAsync());
 
             if (count == 0)
             {
@@ -181,6 +211,12 @@ namespace DAL
                     cmd.Parameters.AddWithValue("@roleId", u.RoleId);
                     await cmd.ExecuteNonQueryAsync();
                 }
+
+                Console.WriteLine("[DB] Seed users added");
+            }
+            else
+            {
+                Console.WriteLine($"[DB] Users table already has {count} users, no seed users added");
             }
         }
     }

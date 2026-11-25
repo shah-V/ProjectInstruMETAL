@@ -28,7 +28,15 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-// העברת אותה מחרוזת יחידה (connectionString) בשני הפרמטרים לאתחול המסד והטבלאות
-await DAL.DatabaseInitializer.InitializeAsync(connectionString, connectionString);
+// עטיפת אתחול בסיס הנתונים ב-try-catch כדי להדפיס שגיאה ברורה אם השרת כבוי או הסיסמה שגויה
+try
+{
+    await DAL.DatabaseInitializer.InitializeAsync(connectionString, connectionString);
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"[DB] Database connection failed: {ex.Message}");
+    throw; // זורק מחדש את החריגה כדי שהשרת לא יעלה ללא בסיס נתונים תקין
+}
 
 app.Run();

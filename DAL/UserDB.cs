@@ -19,7 +19,7 @@ namespace DAL
                 id: reader.GetInt32("UserID"),
                 username: reader.GetString("Username"),
                 email: reader.GetString("Email"),
-                password: reader.GetString("PasswordHash"), // מכיל עכשיו את מחרוזת הגיבוב המלאה
+                password: reader.GetString("PasswordHash"), // מכיל את מחרוזת הגיבוב המלאה
                 roleId: reader.GetInt32("RoleID"),
                 roleName: reader.GetString("RoleName"),
                 isActive: reader.GetBoolean("IsActive"),
@@ -46,6 +46,8 @@ namespace DAL
             {
                 users.Add(ReadUser(reader));
             }
+
+            Console.WriteLine($"[Users] Read {users.Count} users");
             return users;
         }
 
@@ -67,8 +69,11 @@ namespace DAL
             using var reader = (MySqlDataReader)await cmd.ExecuteReaderAsync();
             if (await reader.ReadAsync())
             {
+                Console.WriteLine($"[Users] Read user by id {id}");
                 return ReadUser(reader);
             }
+
+            Console.WriteLine($"[Users] No user with id {id}");
             return null;
         }
 
@@ -77,6 +82,8 @@ namespace DAL
         {
             using var conn = new MySqlConnection(_connectionString);
             await conn.OpenAsync();
+
+            int roleId = user.RoleId == 0 ? 2 : user.RoleId; // ברירת מחדל Student (2)
 
             string sql = @"
                 INSERT INTO Users (Username, Email, PasswordHash, RoleID, IsActive)
@@ -90,11 +97,16 @@ namespace DAL
             // גיבוב הסיסמה לפני שמירתה בבסיס הנתונים
             cmd.Parameters.AddWithValue("@password", BCrypt.Net.BCrypt.HashPassword(user.Password));
 
-            cmd.Parameters.AddWithValue("@roleId", user.RoleId == 0 ? 2 : user.RoleId); // ברירת מחדל Student (2)
+            cmd.Parameters.AddWithValue("@roleId", roleId);
             cmd.Parameters.AddWithValue("@isActive", user.IsActive);
 
             object? result = await cmd.ExecuteScalarAsync();
-            return Convert.ToInt32(result);
+            int newId = Convert.ToInt32(result);
+
+            string roleName = string.IsNullOrWhiteSpace(user.RoleName) ? $"RoleID {roleId}" : user.RoleName;
+            Console.WriteLine($"[Register] New user added: {user.Username} (id {newId}, role {roleName})");
+
+            return newId;
         }
 
         // 4. בדיקה אם שם משתמש כבר תפוס
@@ -142,16 +154,22 @@ namespace DAL
             cmd.Parameters.AddWithValue("@username", username);
 
             using var reader = (MySqlDataReader)await cmd.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
+            if (!await reader.ReadAsync())
             {
-                User user = ReadUser(reader);
-
-                // בדיקה אם הסיסמה שהוקלדה תואמת לגיבוב השמור (כולל חילוץ המלח)
-                if (BCrypt.Net.BCrypt.Verify(password, user.Password))
-                {
-                    return user;
-                }
+                Console.WriteLine($"[Login] Failed, username not found: {username}");
+                return null;
             }
+
+            User user = ReadUser(reader);
+
+            // בדיקה אם הסיסמה שהוקלדה תואמת לגיבוב השמור (כולל חילוץ המלח)
+            if (BCrypt.Net.BCrypt.Verify(password, user.Password))
+            {
+                Console.WriteLine($"[Login] Success: {user.Username} ({user.RoleName})");
+                return user;
+            }
+
+            Console.WriteLine($"[Login] Failed, wrong password: {username}");
             return null;
         }
 
@@ -166,8 +184,16 @@ namespace DAL
             cmd.Parameters.AddWithValue("@roleId", newRoleId);
             cmd.Parameters.AddWithValue("@userId", userId);
 
-            int rowsAffected = await cmd.ExecuteNonQueryAsync();
-            return rowsAffected > 0;
+            bool updated = await cmd.ExecuteNonQueryAsync() > 0;
+            if (updated)
+            {
+                Console.WriteLine($"[Users] Role of user {userId} changed to {newRoleId}");
+            }
+            else
+            {
+                Console.WriteLine($"[Users] Role change failed: user {userId} or role {newRoleId} not found");
+            }
+            return updated;
         }
 
         // 8. עדכון סיסמה - גיבוב הסיסמה החדשה בעזרת BCrypt
@@ -183,8 +209,16 @@ namespace DAL
             cmd.Parameters.AddWithValue("@password", BCrypt.Net.BCrypt.HashPassword(newPassword));
             cmd.Parameters.AddWithValue("@userId", userId);
 
-            int rowsAffected = await cmd.ExecuteNonQueryAsync();
-            return rowsAffected > 0;
+            bool updated = await cmd.ExecuteNonQueryAsync() > 0;
+            if (updated)
+            {
+                Console.WriteLine($"[Users] Password of user {userId} updated");
+            }
+            else
+            {
+                Console.WriteLine($"[Users] Password update failed: no user with id {userId}");
+            }
+            return updated;
         }
 
         // 9. עדכון אימייל
@@ -198,8 +232,16 @@ namespace DAL
             cmd.Parameters.AddWithValue("@email", newEmail);
             cmd.Parameters.AddWithValue("@userId", userId);
 
-            int rowsAffected = await cmd.ExecuteNonQueryAsync();
-            return rowsAffected > 0;
+            bool updated = await cmd.ExecuteNonQueryAsync() > 0;
+            if (updated)
+            {
+                Console.WriteLine($"[Users] Email of user {userId} changed to {newEmail}");
+            }
+            else
+            {
+                Console.WriteLine($"[Users] Email update failed: no user with id {userId}");
+            }
+            return updated;
         }
 
         // 10. מחיקה קשה של משתמש לפי ID (Hard Delete)
@@ -212,8 +254,16 @@ namespace DAL
             using var cmd = new MySqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@userId", userId);
 
-            int rowsAffected = await cmd.ExecuteNonQueryAsync();
-            return rowsAffected > 0;
+            bool deleted = await cmd.ExecuteNonQueryAsync() > 0;
+            if (deleted)
+            {
+                Console.WriteLine($"[Users] User {userId} deleted");
+            }
+            else
+            {
+                Console.WriteLine($"[Users] Delete failed: no user with id {userId}");
+            }
+            return deleted;
         }
 
         // 11. מחיקה רכה של משתמש (Soft Delete) - שינוי סטטוס ל-IsActive = FALSE
@@ -226,8 +276,16 @@ namespace DAL
             using var cmd = new MySqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@userId", userId);
 
-            int rowsAffected = await cmd.ExecuteNonQueryAsync();
-            return rowsAffected > 0;
+            bool deactivated = await cmd.ExecuteNonQueryAsync() > 0;
+            if (deactivated)
+            {
+                Console.WriteLine($"[Users] User {userId} deactivated (soft deleted)");
+            }
+            else
+            {
+                Console.WriteLine($"[Users] Soft delete failed: no user with id {userId}");
+            }
+            return deactivated;
         }
 
         // 12. ספירת משתמשים לפי תפקיד (GROUP BY עם JOIN)
@@ -254,6 +312,7 @@ namespace DAL
                 result[roleName] = count;
             }
 
+            Console.WriteLine($"[Users] Read user counts for {result.Count} roles");
             return result;
         }
     }
